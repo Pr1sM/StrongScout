@@ -16,6 +16,11 @@ class MatchStore: NSObject {
     var currentMatchIndex = -1
     var currentMatch:Match?
     
+    // Action Edit
+    
+    var actionsUndo:Stack<ActionEdit> = Stack<ActionEdit>(limit: 1)
+    var actionsRedo:Stack<ActionEdit> = Stack<ActionEdit>(limit: 1)
+    
     override init() {
         super.init()
         
@@ -91,7 +96,9 @@ class MatchStore: NSObject {
     }
     
     func createMatch() {
-        currentMatch = Match();
+        currentMatch = Match()
+        actionsUndo.clearAll()
+        actionsRedo.clearAll()
     }
     
     func addMatch(newMatch:Match) {
@@ -197,5 +204,9 @@ class MatchStore: NSObject {
         
         return try? NSJSONSerialization.dataWithJSONObject(matchData, options: .PrettyPrinted)
     }
+    
+    // MARK: Actions Edit
+    
+    
     
 }

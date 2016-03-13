@@ -101,6 +101,14 @@ enum ActionType : Int {
     }
 }
 
+enum EditType : Int {
+    case Delete = 0, Add
+    
+    mutating func reverse() {
+        self = self == .Delete ? .Add : .Delete;
+    }
+}
+
 enum SectionType : Int {
     case auto = 0, tele
     
@@ -348,5 +356,49 @@ struct Action: PropertyListReadable {
     func propertyListRepresentation() -> NSDictionary {
         let representation:[String:AnyObject] = ["type":type.rawValue, "section":section.rawValue, "score":score.propertyListRepresentation(), "defense":defense.propertyListRepresentation()]
         return representation
+    }
+}
+
+struct ActionEdit {
+    var action:Action
+    var index:Int
+    var edit:EditType
+    
+    init(edit:EditType, action:Action, atIndex index:Int) {
+        self.edit = edit
+        self.action = action
+        self.index = index
+    }
+}
+
+struct Stack<Element> {
+    private var items = [Element]()
+    private var limit:Int
+    
+    init(limit:Int) {
+        self.limit = limit
+    }
+    
+    mutating func push(item:Element) {
+        if items.count == limit {
+            items.removeFirst()
+        }
+        items.append(item)
+    }
+    
+    mutating func pop() -> Element {
+        return items.removeLast()
+    }
+    
+    func peek() -> Element? {
+        return items.last
+    }
+    
+    func size() -> Int {
+        return items.count
+    }
+    
+    mutating func clearAll() {
+        items.removeAll()
     }
 }

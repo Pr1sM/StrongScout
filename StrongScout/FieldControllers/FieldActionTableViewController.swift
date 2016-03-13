@@ -12,10 +12,64 @@ import UIKit
 class FieldActionTableViewController: UITableViewController {
     var match = MatchStore.sharedStore.currentMatch!
     
+    @IBOutlet var undo:UIBarButtonItem!
+    @IBOutlet var redo:UIBarButtonItem!
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        undo.enabled = MatchStore.sharedStore.actionsUndo.size() > 0
+        redo.enabled = MatchStore.sharedStore.actionsRedo.size() > 0
+    }
+    
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         
         MatchStore.sharedStore.updateCurrentMatchForType(.actionsEdited, match: match)
+    }
+    
+    @IBAction func undoAction(sender:UIBarButtonItem) {
+        var editAction = MatchStore.sharedStore.actionsUndo.pop()
+        editAction.edit.reverse()
+        MatchStore.sharedStore.actionsRedo.push(editAction)
+        print("undo count: \(MatchStore.sharedStore.actionsUndo.size()), redo count: \(MatchStore.sharedStore.actionsRedo.size())")
+        if(editAction.edit == .Add) {
+            match.actionsPerformed.insert(editAction.action, atIndex: editAction.index)
+        } else {
+            print("ERROR: undo delete action")
+        }
+        
+        undo.enabled = MatchStore.sharedStore.actionsUndo.size() > 0
+        redo.enabled = MatchStore.sharedStore.actionsRedo.size() > 0
+        
+        tableView.reloadData()
+    }
+    
+    @IBAction func redoAction(sender:UIBarButtonItem) {
+        var editAction = MatchStore.sharedStore.actionsRedo.pop()
+        editAction.edit.reverse()
+        MatchStore.sharedStore.actionsUndo.push(editAction)
+        print("undo count: \(MatchStore.sharedStore.actionsUndo.size()), redo count: \(MatchStore.sharedStore.actionsRedo.size())")
+        if(editAction.edit == .Delete) {
+            match.actionsPerformed.removeAtIndex(editAction.index)
+//            let indexPath = NSIndexPath(forRow: match.actionsPerformed.count - 1 - editAction.index, inSection: 0)
+//            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Left)
+//            tableView.reloadData()
+        } else {
+            print("ERROR: redo add action")
+        }
+        
+        undo.enabled = MatchStore.sharedStore.actionsUndo.size() > 0
+        redo.enabled = MatchStore.sharedStore.actionsRedo.size() > 0
+        
+        tableView.reloadData()
+    }
+    
+    func removeActionAtIndex(index:Int) {
+        let action = match.actionsPerformed.removeAtIndex(index)
+        MatchStore.sharedStore.actionsUndo.push(ActionEdit(edit: .Delete, action: action, atIndex: index))
+        undo.enabled = MatchStore.sharedStore.actionsUndo.size() > 0
+        redo.enabled = MatchStore.sharedStore.actionsRedo.size() > 0
     }
 }
 
@@ -53,7 +107,7 @@ extension FieldActionTableViewController {
     
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            match.actionsPerformed.removeAtIndex(match.actionsPerformed.count - 1 - indexPath.row)
+            removeActionAtIndex(match.actionsPerformed.count - 1 - indexPath.row)
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Left)
             tableView.reloadData()
         }
@@ -64,14 +118,9 @@ extension FieldActionTableViewController {
     }
 }
 
-// MARK: UITableViewDelegate
-extension FieldActionTableViewController {
-    
-}
-
 extension FieldActionTableViewController:FieldActionTableViewCellDelegate {
     func actionToDeleteAtIndexPath(indexPath: NSIndexPath) {
-        match.actionsPerformed.removeAtIndex(match.actionsPerformed.count - 1 - indexPath.row)
+        removeActionAtIndex(match.actionsPerformed.count - 1 - indexPath.row)
         tableView.beginUpdates()
         tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Left)
         tableView.endUpdates()

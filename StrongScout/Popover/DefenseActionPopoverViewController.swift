@@ -1,5 +1,5 @@
 //
-//  DefenseActionViewController.swift
+//  DefenseActionPopoverViewController.swift
 //  StrongScout
 //
 //  Created by Srinivas Dhanwada on 2/13/16.
