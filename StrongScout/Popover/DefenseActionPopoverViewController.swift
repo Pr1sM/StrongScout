@@ -64,7 +64,7 @@ extension DefenseActionPopoverViewController: UIPopoverPresentationControllerDel
         var action = Action()
         action.section = section
         action.type = .defense
-        action.defense = defenseInfo
+        action.data = .DefenseData(defenseInfo)
         
         MatchStore.sharedStore.updateCurrentMatchWithAction(action)
     }

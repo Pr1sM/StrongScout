@@ -153,7 +153,6 @@ class MatchStore: NSObject {
             currentMatch?.finalRankingPoints = match.finalRankingPoints
             currentMatch?.finalResult = match.finalResult
             currentMatch?.finalPenaltyScore = match.finalPenaltyScore
-            currentMatch?.finalPenalty = match.finalPenalty
             currentMatch?.finalConfiguration = match.finalConfiguration
         case .actionsEdited:
             currentMatch?.actionsPerformed = match.actionsPerformed
@@ -164,12 +163,20 @@ class MatchStore: NSObject {
     
     func updateCurrentMatchWithAction(action:Action) {
         print("Adding Action: \(action.type)")
-        if action.type == .defense {
-            print("\tDefense Type: \(action.defense.type.toString())")
-            print("\tDefense Action: \(action.defense.actionPerformed.toString())")
-        } else if action.type == .score {
-            print("\tScoreType: \(action.score.type.toString())")
-            print("\tScoreLoc: \(action.score.location.toString())")
+        switch action.data {
+        case let .ScoreData(score):
+            print("\tScoreType: \(score.type.toString())")
+            print("\tScoreLoc:  \(score.location.toString())")
+            break
+        case let .DefenseData(defense):
+            print("\tDefenseType:   \(defense.type.toString())")
+            print("\tDefenseAction: \(defense.actionPerformed.toString())")
+            break
+        case let .PenaltyData(penalty):
+            print("\tPenaltyType: \(penalty.toString())")
+            break
+        default:
+            break
         }
         currentMatch?.actionsPerformed.append(action)
     }
@@ -184,7 +191,7 @@ class MatchStore: NSObject {
         aggregateCurrentMatchData()
         allMatches?.append(currentMatch!)
         let success = self.saveChanges()
-        print("All Matches was \(success ? "" : "un")successfully saved")
+        print("All Matches were \(success ? "" : "un")successfully saved")
         currentMatch = nil
     }
     

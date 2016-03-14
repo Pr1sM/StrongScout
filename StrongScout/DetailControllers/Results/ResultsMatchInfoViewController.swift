@@ -15,10 +15,12 @@ class ResultsMatchInfoViewController: UIViewController {
     @IBOutlet weak var alliance: UILabel!
     @IBOutlet weak var finalResult: UILabel!
     @IBOutlet weak var finalScore: UILabel!
-    @IBOutlet weak var finalPenalty: UILabel!
-    @IBOutlet weak var finalPenaltyCard: UILabel!
     @IBOutlet weak var finalConfig: UILabel!
     @IBOutlet weak var finalRobot: UILabel!
+    @IBOutlet weak var finalFouls: UILabel!
+    @IBOutlet weak var finalTechFouls: UILabel!
+    @IBOutlet weak var finalYellowCards: UILabel!
+    @IBOutlet weak var finalRedCards: UILabel!
     
     var match:Match!
     
@@ -39,10 +41,12 @@ class ResultsMatchInfoViewController: UIViewController {
         
         finalResult.text = "\(match.finalResult.toString()) (\(match.finalRankingPoints))"
         finalScore.text = "\(match.finalScore) (\(match.finalPenaltyScore))"
-        finalPenalty.text = "\(match.finalPenalty.foulToString())"
-        finalPenaltyCard.text = "\(match.finalPenalty.cardToString())"
         finalConfig.text = "\(match.finalConfiguration.toString())"
         finalRobot.text = "\(match.finalRobot.toString())"
+        finalFouls.text = "\(match.finalFouls)"
+        finalTechFouls.text = "\(match.finalTechFouls)"
+        finalYellowCards.text = "\(match.finalYellowCards)"
+        finalRedCards.text = "\(match.finalRedCards)"
     }
 
     override func didReceiveMemoryWarning() {

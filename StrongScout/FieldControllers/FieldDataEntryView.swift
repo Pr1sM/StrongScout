@@ -153,6 +153,21 @@ class FieldDataEntryView: UIViewController {
         fifthDefense.image  = UIImage(named: (match?.defense5.type.toString())!)
     }
     
+    @IBAction func addFoulTap(sender:UIBarButtonItem) {
+        let foul = storyboard?.instantiateViewControllerWithIdentifier("FoulActionPopoverViewController") as! FoulActionPopoverViewController
+        foul.section = SectionType(rawValue: sectionSelection.selectedSegmentIndex)!
+        let navControl = UINavigationController(rootViewController: foul)
+        navControl.modalPresentationStyle = .Popover
+        foul.preferredContentSize = CGSize(width: 372, height: 198)
+        navControl.preferredContentSize = CGSize(width: 372, height: 198)
+        
+        let popover = navControl.popoverPresentationController
+        popover?.permittedArrowDirections = .Down
+        popover?.barButtonItem = sender
+        popover?.delegate = foul
+        self.presentViewController(navControl, animated: true, completion: nil)
+    }
+    
     @IBAction func unwindToFieldDataEntryView(sender:UIStoryboardSegue) {
         match = MatchStore.sharedStore.currentMatch!
         setupImageViews()

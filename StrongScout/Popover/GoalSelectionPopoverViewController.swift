@@ -72,7 +72,7 @@ extension GoalSelectionPopoverViewController: UIPopoverPresentationControllerDel
         var action = Action()
         action.type = .score
         action.section = section
-        action.score = score
+        action.data = .ScoreData(score)
         MatchStore.sharedStore.updateCurrentMatchWithAction(action)
     }
 }

@@ -122,54 +122,6 @@ class FinalViewController: UIViewController {
         self.view.endEditing(true)
         readyToMoveOn()
     }
-    
-    @IBAction func PenaltyTap(sender:UIButton) {
-        if sender.tag == 1 {
-            if match.finalPenalty.contains(.Foul) {
-                match.finalPenalty.remove(.Foul)
-                sender.selected = false
-            }
-            else {
-                match.finalPenalty.unionInPlace(.Foul)
-                sender.selected = true
-            }
-        }
-        else if sender.tag == 2 {
-            if match.finalPenalty.contains(.TechFoul) {
-                match.finalPenalty.remove(.TechFoul)
-                sender.selected = false
-            }
-            else {
-                match.finalPenalty.unionInPlace(.TechFoul)
-                sender.selected = true
-            }
-        }
-        else if sender.tag == 3 {
-            if !match.finalPenalty.contains(.YellowCard) {
-                match.finalPenalty.unionInPlace(.YellowCard)
-                match.finalPenalty.subtractInPlace(.RedCard)
-                sender.selected = true
-                PenaltyButtons[3].selected = false
-            }
-            else {
-                match.finalPenalty.remove(.YellowCard)
-                sender.selected = false
-            }
-        }
-        else if sender.tag == 4 {
-            if !match.finalPenalty.contains(.RedCard) {
-                match.finalPenalty.unionInPlace(.RedCard)
-                match.finalPenalty.subtractInPlace(.YellowCard)
-                sender.selected = true
-                PenaltyButtons[2].selected = false
-            }
-            else{
-                match.finalPenalty.remove(.RedCard)
-                sender.selected = false
-            }
-        }
-        self.view.endEditing(true)
-    }
 
     @IBAction func FinalScoreEndEdit(sender: UITextField) {
         if sender.text?.characters.count > 0 {

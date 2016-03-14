@@ -93,11 +93,12 @@ enum AllianceType : Int {
 }
 
 enum ActionType : Int {
-    case unknown = 0, score, defense
+    case unknown = 0, score, defense, penalty
     
     func toString() -> String {
         return (self == .score)   ? "Score"   :
-               (self == .defense) ? "Defense" : "Unknown"
+               (self == .defense) ? "Defense" :
+               (self == .penalty) ? "Penalty" : "Unknown"
     }
 }
 
@@ -158,39 +159,14 @@ enum UpdateType : Int {
     case none = 0, teamInfo, fieldSetup, finalStats, actionsEdited
 }
 
-struct PenaltyType:OptionSetType {
-    let rawValue:Int
+enum PenaltyType : Int {
+    case None = 0, Foul, TechFoul, YellowCard, RedCard
     
-    static let None       = PenaltyType(rawValue: 0)
-    static let Foul       = PenaltyType(rawValue: 1 << 0)
-    static let TechFoul   = PenaltyType(rawValue: 1 << 1)
-    static let YellowCard = PenaltyType(rawValue: 1 << 2)
-    static let RedCard    = PenaltyType(rawValue: 1 << 3)
-    
-    func foulToString() -> String {
-        switch self.rawValue {
-        case 1:
-            return "Foul"
-        case 2:
-            return "Tech"
-        case 3:
-            return "Foul+Tech"
-        default:
-            return "None"
-        }
-    }
-    
-    func cardToString() -> String {
-        switch self.rawValue {
-        case 4:
-            return "Yellow"
-        case 8:
-            return "Red"
-        case 12:
-            return "Yel+Red"
-        default:
-            return "None"
-        }
+    func toString() -> String {
+        return self == .Foul       ? "Foul"           :
+               self == .TechFoul   ? "Technical Foul" :
+               self == .YellowCard ? "Yellow Card"    :
+               self == .RedCard    ? "Red Card"       : "None"
     }
 }
 
@@ -286,6 +262,8 @@ struct Defense: PropertyListReadable {
     }
 }
 
+
+
 struct Score: PropertyListReadable {
     var type:ScoreType = .Unknown
     var location:ScoreLocation = .Unknown
@@ -330,34 +308,91 @@ struct DefenseInfo: PropertyListReadable {
     }
 }
 
-struct Action: PropertyListReadable {
-    var section:SectionType = .tele
-    var type:ActionType = .unknown
-    var score:Score = Score()
-    var defense:DefenseInfo = DefenseInfo()
-    
-    init() {
-    
-    }
+enum ActionData: PropertyListReadable {
+    case None
+    case ScoreData(Score)
+    case DefenseData(DefenseInfo)
+    case PenaltyData(PenaltyType)
     
     init?(propertyListRepresentation: NSDictionary?) {
         guard let values = propertyListRepresentation else { return nil }
-        if let t = values["type"] as? Int,
-           let st = values["section"] as? Int,
-           let s = values["score"] as? NSDictionary?,
-           let d = values["defense"] as? NSDictionary? {
-            self.type = ActionType(rawValue: t)!
-            self.section = SectionType(rawValue: st)!
-            self.score = Score(propertyListRepresentation: s)!
-            self.defense = DefenseInfo(propertyListRepresentation: d)!
+        if let s = values["score"] as? NSDictionary {
+            self = ActionData.ScoreData(Score(propertyListRepresentation: s)!)
+        } else if let d = values["defense"] as? NSDictionary {
+            self = .DefenseData(DefenseInfo(propertyListRepresentation: d)!)
+        } else if let p = values["penalty"] as? Int {
+            self = .PenaltyData(PenaltyType(rawValue: p)!)
+        } else {
+            self = .None
         }
     }
     
     func propertyListRepresentation() -> NSDictionary {
-        let representation:[String:AnyObject] = ["type":type.rawValue, "section":section.rawValue, "score":score.propertyListRepresentation(), "defense":defense.propertyListRepresentation()]
-        return representation
+        switch self {
+        case let .ScoreData(score):
+            return ["score":score.propertyListRepresentation()]
+        case let .DefenseData(defense):
+            return ["defense":defense.propertyListRepresentation()]
+        case let .PenaltyData(penalty):
+            return ["penalty":penalty.rawValue]
+        default:
+            return ["none":0]
+        }
     }
 }
+
+struct Action: PropertyListReadable {
+    var section:SectionType = .tele
+    var type:ActionType = .unknown
+    var data:ActionData = .None
+    
+    init() {}
+    
+    init?(propertyListRepresentation: NSDictionary?) {
+        guard let values = propertyListRepresentation else { return nil }
+        if let t = values["type"] as? Int,
+           let s = values["section"] as? Int,
+           let d = values["data"] as? NSDictionary {
+            self.type = ActionType(rawValue: t)!
+            self.section = SectionType(rawValue: s)!
+            self.data = ActionData(propertyListRepresentation: d)!
+        }
+    }
+    
+    func propertyListRepresentation() -> NSDictionary {
+        return ["type":type.rawValue, "section":section.rawValue, "data":data.propertyListRepresentation()]
+    }
+}
+
+
+//struct Action: PropertyListReadable {
+//    var section:SectionType = .tele
+//    var type:ActionType = .unknown
+//    var score:Score = Score()
+//    var defense:DefenseInfo = DefenseInfo()
+//    
+//    init() {
+//    
+//    }
+//    
+//    init?(propertyListRepresentation: NSDictionary?) {
+//        guard let values = propertyListRepresentation else { return nil }
+//        if let t = values["type"] as? Int,
+//           let st = values["section"] as? Int,
+//           let s = values["score"] as? NSDictionary?,
+//           let d = values["defense"] as? NSDictionary? {
+//            self.type = ActionType(rawValue: t)!
+//            self.section = SectionType(rawValue: st)!
+//            self.score = Score(propertyListRepresentation: s)!
+//            self.defense = DefenseInfo(propertyListRepresentation: d)!
+//        }
+//    }
+//    
+//    func propertyListRepresentation() -> NSDictionary {
+//        let representation:[String:AnyObject] = ["type":type.rawValue, "section":section.rawValue, "score":score.propertyListRepresentation(), "defense":defense.propertyListRepresentation()]
+//        return representation
+//    }
+//}
 
 struct ActionEdit {
     var action:Action

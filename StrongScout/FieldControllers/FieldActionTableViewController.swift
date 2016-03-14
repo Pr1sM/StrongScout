@@ -92,10 +92,18 @@ extension FieldActionTableViewController {
         let action = match.actionsPerformed[match.actionsPerformed.count - 1 - indexPath.row]
         cell.textLabel?.text = action.type.toString()
         var description = ""
-        if action.type == .score {
-            description = "\(action.score.type.toString()) from the \(action.score.location.toString())"
-        } else if action.type == .defense {
-            description = "\(action.defense.actionPerformed.toString()) on \(action.defense.type.toString())"
+        switch action.data {
+        case let .ScoreData(score):
+            description = "\(score.type.toString()) from the \(score.location.toString())"
+            break
+        case let .DefenseData(defense):
+            description = "\(defense.actionPerformed.toString()) on \(defense.type.toString())"
+            break
+        case let .PenaltyData(penalty):
+            description = "\(penalty.toString()) awarded"
+            break
+        default:
+            break
         }
         cell.detailTextLabel?.text = description
         return cell

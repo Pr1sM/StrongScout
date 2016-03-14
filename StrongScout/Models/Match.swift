@@ -56,7 +56,10 @@ class Match : NSObject, NSCoding {
     var finalRankingPoints:Int = -1
     var finalResult:ResultType = .none
     var finalPenaltyScore:Int = -1
-    var finalPenalty:PenaltyType = .None
+    var finalFouls = 0
+    var finalTechFouls = 0
+    var finalYellowCards = 0
+    var finalRedCards = 0
     var finalRobot:RobotState = .None
     var finalConfiguration:FinalConfigType = .none
     
@@ -78,88 +81,104 @@ class Match : NSObject, NSCoding {
         self.defense4.location = 4
         self.defense5.location = 5
         
+        self.finalFouls = 0
+        self.finalTechFouls = 0
+        self.finalYellowCards = 0
+        self.finalRedCards = 0
+        
         for action in self.actionsPerformed {
             if let a:Action = action {
-                if a.type == .score {
+                switch a.data {
+                case let .ScoreData(score):
                     if a.section == .tele {
-                        self.scoreHigh       += (a.score.type == .High)          ? 1 : 0
-                        self.scoreLow        += (a.score.type == .Low)           ? 1 : 0
-                        self.scoreMissedHigh += (a.score.type == .MissedHigh)    ? 1 : 0
-                        self.scoreMissedLow  += (a.score.type == .MissedLow)     ? 1 : 0
-                        self.scoredBatters   += (a.score.location == .Batter)    ? 1 : 0
-                        self.scoredMiddle    += (a.score.location == .Courtyard) ? 1 : 0
-                        self.scoredDefenses  += (a.score.location == .Defenses)  ? 1 : 0
+                        self.scoreHigh       += (score.type == .High)          ? 1 : 0
+                        self.scoreLow        += (score.type == .Low)           ? 1 : 0
+                        self.scoreMissedHigh += (score.type == .MissedHigh)    ? 1 : 0
+                        self.scoreMissedLow  += (score.type == .MissedLow)     ? 1 : 0
+                        self.scoredBatters   += (score.location == .Batter)    ? 1 : 0
+                        self.scoredMiddle    += (score.location == .Courtyard) ? 1 : 0
+                        self.scoredDefenses  += (score.location == .Defenses)  ? 1 : 0
                     } else {
-                        self.autoScoreHigh      += (a.score.type == .High)          ? 1 : 0
-                        self.autoScoreLow       += (a.score.type == .Low)           ? 1 : 0
-                        self.autoMissedHigh     += (a.score.type == .MissedHigh)    ? 1 : 0
-                        self.autoMissedLow      += (a.score.type == .MissedLow)     ? 1 : 0
-                        self.autoScoredBatters  += (a.score.location == .Batter)    ? 1 : 0
-                        self.autoScoredMiddle   += (a.score.location == .Courtyard) ? 1 : 0
-                        self.autoScoredDefenses += (a.score.location == .Defenses)  ? 1 : 0
+                        self.autoScoreHigh      += (score.type == .High)          ? 1 : 0
+                        self.autoScoreLow       += (score.type == .Low)           ? 1 : 0
+                        self.autoMissedHigh     += (score.type == .MissedHigh)    ? 1 : 0
+                        self.autoMissedLow      += (score.type == .MissedLow)     ? 1 : 0
+                        self.autoScoredBatters  += (score.location == .Batter)    ? 1 : 0
+                        self.autoScoredMiddle   += (score.location == .Courtyard) ? 1 : 0
+                        self.autoScoredDefenses += (score.location == .Defenses)  ? 1 : 0
                     }
-                } else if a.type == .defense {
-                    if a.defense.type == self.defense1.type {
+                    continue
+                case let .DefenseData(defense):
+                    if defense.type == self.defense1.type {
                         if a.section == .tele {
-                            self.defense1.timesCrossed         += (a.defense.actionPerformed == .Crossed)         ? 1 : 0
-                            self.defense1.failedTimesCrossed   += (a.defense.actionPerformed == .AttemptedCross)  ? 1 : 0
-                            self.defense1.timesCrossedWithBall += (a.defense.actionPerformed == .CrossedWithBall) ? 1 : 0
-                            self.defense1.timesAssistedCross   += (a.defense.actionPerformed == .AssistedCross)   ? 1 : 0
+                            self.defense1.timesCrossed         += (defense.actionPerformed == .Crossed)         ? 1 : 0
+                            self.defense1.failedTimesCrossed   += (defense.actionPerformed == .AttemptedCross)  ? 1 : 0
+                            self.defense1.timesCrossedWithBall += (defense.actionPerformed == .CrossedWithBall) ? 1 : 0
+                            self.defense1.timesAssistedCross   += (defense.actionPerformed == .AssistedCross)   ? 1 : 0
                         } else {
-                            self.defense1.autoTimesCrossed         += (a.defense.actionPerformed == .Crossed)         ? 1 : 0
-                            self.defense1.autoFailedTimesCrossed   += (a.defense.actionPerformed == .AttemptedCross)  ? 1 : 0
-                            self.defense1.autoTimesCrossedWithBall += (a.defense.actionPerformed == .CrossedWithBall) ? 1 : 0
-                            self.defense1.autoTimesAssistedCross   += (a.defense.actionPerformed == .AssistedCross)   ? 1 : 0
+                            self.defense1.autoTimesCrossed         += (defense.actionPerformed == .Crossed)         ? 1 : 0
+                            self.defense1.autoFailedTimesCrossed   += (defense.actionPerformed == .AttemptedCross)  ? 1 : 0
+                            self.defense1.autoTimesCrossedWithBall += (defense.actionPerformed == .CrossedWithBall) ? 1 : 0
+                            self.defense1.autoTimesAssistedCross   += (defense.actionPerformed == .AssistedCross)   ? 1 : 0
                         }
-                    } else if a.defense.type == self.defense2.type {
+                    } else if defense.type == self.defense2.type {
                         if a.section == .tele {
-                            self.defense2.timesCrossed         += (a.defense.actionPerformed == .Crossed)         ? 1 : 0
-                            self.defense2.failedTimesCrossed   += (a.defense.actionPerformed == .AttemptedCross)  ? 1 : 0
-                            self.defense2.timesCrossedWithBall += (a.defense.actionPerformed == .CrossedWithBall) ? 1 : 0
-                            self.defense2.timesAssistedCross   += (a.defense.actionPerformed == .AssistedCross)   ? 1 : 0
+                            self.defense2.timesCrossed         += (defense.actionPerformed == .Crossed)         ? 1 : 0
+                            self.defense2.failedTimesCrossed   += (defense.actionPerformed == .AttemptedCross)  ? 1 : 0
+                            self.defense2.timesCrossedWithBall += (defense.actionPerformed == .CrossedWithBall) ? 1 : 0
+                            self.defense2.timesAssistedCross   += (defense.actionPerformed == .AssistedCross)   ? 1 : 0
                         } else {
-                            self.defense2.autoTimesCrossed         += (a.defense.actionPerformed == .Crossed)         ? 1 : 0
-                            self.defense2.autoFailedTimesCrossed   += (a.defense.actionPerformed == .AttemptedCross)  ? 1 : 0
-                            self.defense2.autoTimesCrossedWithBall += (a.defense.actionPerformed == .CrossedWithBall) ? 1 : 0
-                            self.defense2.autoTimesAssistedCross   += (a.defense.actionPerformed == .AssistedCross)   ? 1 : 0
+                            self.defense2.autoTimesCrossed         += (defense.actionPerformed == .Crossed)         ? 1 : 0
+                            self.defense2.autoFailedTimesCrossed   += (defense.actionPerformed == .AttemptedCross)  ? 1 : 0
+                            self.defense2.autoTimesCrossedWithBall += (defense.actionPerformed == .CrossedWithBall) ? 1 : 0
+                            self.defense2.autoTimesAssistedCross   += (defense.actionPerformed == .AssistedCross)   ? 1 : 0
                         }
-                    } else if a.defense.type == self.defense3.type {
+                    } else if defense.type == self.defense3.type {
                         if a.section == .tele {
-                            self.defense3.timesCrossed         += (a.defense.actionPerformed == .Crossed)         ? 1 : 0
-                            self.defense3.failedTimesCrossed   += (a.defense.actionPerformed == .AttemptedCross)  ? 1 : 0
-                            self.defense3.timesCrossedWithBall += (a.defense.actionPerformed == .CrossedWithBall) ? 1 : 0
-                            self.defense3.timesAssistedCross   += (a.defense.actionPerformed == .AssistedCross)   ? 1 : 0
+                            self.defense3.timesCrossed         += (defense.actionPerformed == .Crossed)         ? 1 : 0
+                            self.defense3.failedTimesCrossed   += (defense.actionPerformed == .AttemptedCross)  ? 1 : 0
+                            self.defense3.timesCrossedWithBall += (defense.actionPerformed == .CrossedWithBall) ? 1 : 0
+                            self.defense3.timesAssistedCross   += (defense.actionPerformed == .AssistedCross)   ? 1 : 0
                         } else {
-                            self.defense3.autoTimesCrossed         += (a.defense.actionPerformed == .Crossed)         ? 1 : 0
-                            self.defense3.autoFailedTimesCrossed   += (a.defense.actionPerformed == .AttemptedCross)  ? 1 : 0
-                            self.defense3.autoTimesCrossedWithBall += (a.defense.actionPerformed == .CrossedWithBall) ? 1 : 0
-                            self.defense3.autoTimesAssistedCross   += (a.defense.actionPerformed == .AssistedCross)   ? 1 : 0
+                            self.defense3.autoTimesCrossed         += (defense.actionPerformed == .Crossed)         ? 1 : 0
+                            self.defense3.autoFailedTimesCrossed   += (defense.actionPerformed == .AttemptedCross)  ? 1 : 0
+                            self.defense3.autoTimesCrossedWithBall += (defense.actionPerformed == .CrossedWithBall) ? 1 : 0
+                            self.defense3.autoTimesAssistedCross   += (defense.actionPerformed == .AssistedCross)   ? 1 : 0
                         }
-                    } else if a.defense.type == self.defense4.type {
+                    } else if defense.type == self.defense4.type {
                         if a.section == .tele {
-                            self.defense4.timesCrossed         += (a.defense.actionPerformed == .Crossed)         ? 1 : 0
-                            self.defense4.failedTimesCrossed   += (a.defense.actionPerformed == .AttemptedCross)  ? 1 : 0
-                            self.defense4.timesCrossedWithBall += (a.defense.actionPerformed == .CrossedWithBall) ? 1 : 0
-                            self.defense4.timesAssistedCross   += (a.defense.actionPerformed == .AssistedCross)   ? 1 : 0
+                            self.defense4.timesCrossed         += (defense.actionPerformed == .Crossed)         ? 1 : 0
+                            self.defense4.failedTimesCrossed   += (defense.actionPerformed == .AttemptedCross)  ? 1 : 0
+                            self.defense4.timesCrossedWithBall += (defense.actionPerformed == .CrossedWithBall) ? 1 : 0
+                            self.defense4.timesAssistedCross   += (defense.actionPerformed == .AssistedCross)   ? 1 : 0
                         } else {
-                            self.defense4.autoTimesCrossed         += (a.defense.actionPerformed == .Crossed)         ? 1 : 0
-                            self.defense4.autoFailedTimesCrossed   += (a.defense.actionPerformed == .AttemptedCross)  ? 1 : 0
-                            self.defense4.autoTimesCrossedWithBall += (a.defense.actionPerformed == .CrossedWithBall) ? 1 : 0
-                            self.defense4.autoTimesAssistedCross   += (a.defense.actionPerformed == .AssistedCross)   ? 1 : 0
+                            self.defense4.autoTimesCrossed         += (defense.actionPerformed == .Crossed)         ? 1 : 0
+                            self.defense4.autoFailedTimesCrossed   += (defense.actionPerformed == .AttemptedCross)  ? 1 : 0
+                            self.defense4.autoTimesCrossedWithBall += (defense.actionPerformed == .CrossedWithBall) ? 1 : 0
+                            self.defense4.autoTimesAssistedCross   += (defense.actionPerformed == .AssistedCross)   ? 1 : 0
                         }
-                    } else if a.defense.type == self.defense5.type {
+                    } else if defense.type == self.defense5.type {
                         if a.section == .tele {
-                            self.defense5.timesCrossed         += (a.defense.actionPerformed == .Crossed)         ? 1 : 0
-                            self.defense5.failedTimesCrossed   += (a.defense.actionPerformed == .AttemptedCross)  ? 1 : 0
-                            self.defense5.timesCrossedWithBall += (a.defense.actionPerformed == .CrossedWithBall) ? 1 : 0
-                            self.defense5.timesAssistedCross   += (a.defense.actionPerformed == .AssistedCross)   ? 1 : 0
+                            self.defense5.timesCrossed         += (defense.actionPerformed == .Crossed)         ? 1 : 0
+                            self.defense5.failedTimesCrossed   += (defense.actionPerformed == .AttemptedCross)  ? 1 : 0
+                            self.defense5.timesCrossedWithBall += (defense.actionPerformed == .CrossedWithBall) ? 1 : 0
+                            self.defense5.timesAssistedCross   += (defense.actionPerformed == .AssistedCross)   ? 1 : 0
                         } else {
-                            self.defense5.autoTimesCrossed         += (a.defense.actionPerformed == .Crossed)         ? 1 : 0
-                            self.defense5.autoFailedTimesCrossed   += (a.defense.actionPerformed == .AttemptedCross)  ? 1 : 0
-                            self.defense5.autoTimesCrossedWithBall += (a.defense.actionPerformed == .CrossedWithBall) ? 1 : 0
-                            self.defense5.autoTimesAssistedCross   += (a.defense.actionPerformed == .AssistedCross)   ? 1 : 0
+                            self.defense5.autoTimesCrossed         += (defense.actionPerformed == .Crossed)         ? 1 : 0
+                            self.defense5.autoFailedTimesCrossed   += (defense.actionPerformed == .AttemptedCross)  ? 1 : 0
+                            self.defense5.autoTimesCrossedWithBall += (defense.actionPerformed == .CrossedWithBall) ? 1 : 0
+                            self.defense5.autoTimesAssistedCross   += (defense.actionPerformed == .AssistedCross)   ? 1 : 0
                         }
                     }
+                    continue
+                case let .PenaltyData(penalty):
+                    self.finalFouls       += (penalty == .Foul)       ? 1 : 0
+                    self.finalTechFouls   += (penalty == .TechFoul)   ? 1 : 0
+                    self.finalYellowCards += (penalty == .YellowCard) ? 1 : 0
+                    self.finalRedCards    += (penalty == .RedCard)    ? 1 : 0
+                    continue
+                default:
+                    continue
                 }
             }
         }
@@ -211,7 +230,10 @@ class Match : NSObject, NSCoding {
         aCoder.encodeInteger(finalRankingPoints,          forKey: "finalRankingPoints")
         aCoder.encodeInteger(finalResult.rawValue,        forKey: "finalResult")
         aCoder.encodeInteger(finalPenaltyScore,           forKey: "finalPenaltyScore")
-        aCoder.encodeInteger(finalPenalty.rawValue,       forKey: "finalPenalty")
+        aCoder.encodeInteger(finalFouls,                  forKey: "finalFouls")
+        aCoder.encodeInteger(finalTechFouls,              forKey: "finalTechFouls")
+        aCoder.encodeInteger(finalYellowCards,            forKey: "finalYellowCards")
+        aCoder.encodeInteger(finalRedCards,               forKey: "finalRedCards")
         aCoder.encodeInteger(finalRobot.rawValue,         forKey: "finalRobot")
         aCoder.encodeInteger(finalConfiguration.rawValue, forKey: "finalConfiguration")
     }
@@ -262,7 +284,10 @@ class Match : NSObject, NSCoding {
         self.finalRankingPoints = aDecoder.decodeIntegerForKey("finalRankingPoints")
         self.finalResult        = ResultType(rawValue: aDecoder.decodeIntegerForKey("finalResult"))!
         self.finalPenaltyScore  = aDecoder.decodeIntegerForKey("finalPenaltyScore")
-        self.finalPenalty       = PenaltyType(rawValue: aDecoder.decodeIntegerForKey("finalPenalty"))
+        self.finalFouls         = aDecoder.decodeIntegerForKey("finalFouls")
+        self.finalTechFouls     = aDecoder.decodeIntegerForKey("finalTechFouls")
+        self.finalYellowCards   = aDecoder.decodeIntegerForKey("finalYellowCards")
+        self.finalRedCards      = aDecoder.decodeIntegerForKey("finalRedCards")
         self.finalRobot         = RobotState(rawValue: aDecoder.decodeIntegerForKey("finalScore"))
         self.finalConfiguration = FinalConfigType(rawValue: aDecoder.decodeIntegerForKey("finalConfiguration"))!
     }
