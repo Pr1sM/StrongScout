@@ -62,13 +62,15 @@ class Match : NSObject, NSCoding {
     var finalRedCards = 0
     var finalRobot:RobotState = .None
     var finalConfiguration:FinalConfigType = .none
+    var finalComments = ""
     
     func aggregateActionsPerformed() {
-        scoreHigh = 0
-        scoreLow = 0
-        scoredBatters = 0
+        self.scoreHigh      = 0
+        self.scoreLow       = 0
+        self.scoredBatters  = 0
         self.scoredDefenses = 0
-        self.scoredMiddle = 0
+        self.scoredMiddle   = 0
+        
         self.defense1.clearStats()
         self.defense2.clearStats()
         self.defense3.clearStats()
@@ -188,28 +190,28 @@ class Match : NSObject, NSCoding {
     func encodeWithCoder(aCoder: NSCoder) {
         
         // Team Information
-        aCoder.encodeInteger(teamNumber, forKey: "teamNumber")
-        aCoder.encodeInteger(matchNumber, forKey: "matchNumber")
+        aCoder.encodeInteger(teamNumber,        forKey: "teamNumber")
+        aCoder.encodeInteger(matchNumber,       forKey: "matchNumber")
         aCoder.encodeInteger(alliance.rawValue, forKey: "alliance")
-        aCoder.encodeInteger(isCompleted, forKey: "isCompleted")
+        aCoder.encodeInteger(isCompleted,       forKey: "isCompleted")
         
         // Auto Score Information
-        aCoder.encodeInteger(autoScoreHigh, forKey: "autoScoreHigh")
-        aCoder.encodeInteger(autoScoreLow, forKey: "autoScoreLow")
-        aCoder.encodeInteger(autoMissedHigh, forKey: "autoMissedHigh")
-        aCoder.encodeInteger(autoMissedLow, forKey: "autoMissedLow")
-        aCoder.encodeInteger(autoScoredBatters, forKey: "autoScoredBatters")
-        aCoder.encodeInteger(autoScoredMiddle, forKey: "autoScoredCourtyard")
+        aCoder.encodeInteger(autoScoreHigh,      forKey: "autoScoreHigh")
+        aCoder.encodeInteger(autoScoreLow,       forKey: "autoScoreLow")
+        aCoder.encodeInteger(autoMissedHigh,     forKey: "autoMissedHigh")
+        aCoder.encodeInteger(autoMissedLow,      forKey: "autoMissedLow")
+        aCoder.encodeInteger(autoScoredBatters,  forKey: "autoScoredBatters")
+        aCoder.encodeInteger(autoScoredMiddle,   forKey: "autoScoredCourtyard")
         aCoder.encodeInteger(autoScoredDefenses, forKey: "autoScoredDefenses")
         
         // Score Information
-        aCoder.encodeInteger(scoreHigh, forKey: "scoreHigh")
-        aCoder.encodeInteger(scoreLow, forKey: "scoreLow")
+        aCoder.encodeInteger(scoreHigh,       forKey: "scoreHigh")
+        aCoder.encodeInteger(scoreLow,        forKey: "scoreLow")
         aCoder.encodeInteger(scoreMissedHigh, forKey: "scoreMissedHigh")
-        aCoder.encodeInteger(scoreMissedLow, forKey: "scoreMissedLow")
-        aCoder.encodeInteger(scoredBatters, forKey: "scoredBatters")
-        aCoder.encodeInteger(scoredMiddle, forKey: "scoredCourtyard")
-        aCoder.encodeInteger(scoredDefenses, forKey: "scoredDefenses")
+        aCoder.encodeInteger(scoreMissedLow,  forKey: "scoreMissedLow")
+        aCoder.encodeInteger(scoredBatters,   forKey: "scoredBatters")
+        aCoder.encodeInteger(scoredMiddle,    forKey: "scoredCourtyard")
+        aCoder.encodeInteger(scoredDefenses,  forKey: "scoredDefenses")
         
         // Defense Information
         aCoder.encodeObject(defense1.propertyListRepresentation(), forKey: "defense1")
@@ -236,6 +238,7 @@ class Match : NSObject, NSCoding {
         aCoder.encodeInteger(finalRedCards,               forKey: "finalRedCards")
         aCoder.encodeInteger(finalRobot.rawValue,         forKey: "finalRobot")
         aCoder.encodeInteger(finalConfiguration.rawValue, forKey: "finalConfiguration")
+        aCoder.encodeObject(finalComments,                forKey: "finalComments")
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -288,8 +291,9 @@ class Match : NSObject, NSCoding {
         self.finalTechFouls     = aDecoder.decodeIntegerForKey("finalTechFouls")
         self.finalYellowCards   = aDecoder.decodeIntegerForKey("finalYellowCards")
         self.finalRedCards      = aDecoder.decodeIntegerForKey("finalRedCards")
-        self.finalRobot         = RobotState(rawValue: aDecoder.decodeIntegerForKey("finalScore"))
+        self.finalRobot         = RobotState(rawValue: aDecoder.decodeIntegerForKey("finalRobot"))
         self.finalConfiguration = FinalConfigType(rawValue: aDecoder.decodeIntegerForKey("finalConfiguration"))!
+        self.finalComments      = (aDecoder.decodeObjectForKey("finalComments") as? String) ?? ""
     }
     
     override init() {
@@ -297,34 +301,35 @@ class Match : NSObject, NSCoding {
     }
     
     func messageDictionary() -> NSDictionary {
-        var data:[String:AnyObject] = [String:AnyObject]()
-        var team:[String:AnyObject] = [String:AnyObject]()
-        var auto:[String:AnyObject] = [String:AnyObject]()
-        var score:[String:AnyObject] = [String:AnyObject]()
+        var data:[String:AnyObject]    = [String:AnyObject]()
+        var team:[String:AnyObject]    = [String:AnyObject]()
+        var auto:[String:AnyObject]    = [String:AnyObject]()
+        var score:[String:AnyObject]   = [String:AnyObject]()
         var defense:[String:AnyObject] = [String:AnyObject]()
+        var final:[String:AnyObject]   = [String:AnyObject]()
         
         // Team Info
-        team["teamNumber"] = teamNumber
+        team["teamNumber"]  = teamNumber
         team["matchNumber"] = matchNumber
-        team["alliance"] = alliance.toString()
+        team["alliance"]    = alliance.toString()
         
         // Auto
-        auto["scoreHigh"] = autoScoreHigh
-        auto["scoreLow"] = autoScoreLow
-        auto["missedHigh"] = autoMissedHigh
-        auto["missedLow"] = autoMissedLow
-        auto["scoreBatters"] = autoScoredBatters
+        auto["scoreHigh"]      = autoScoreHigh
+        auto["scoreLow"]       = autoScoreLow
+        auto["missedHigh"]     = autoMissedHigh
+        auto["missedLow"]      = autoMissedLow
+        auto["scoreBatters"]   = autoScoredBatters
         auto["scoreCourtyard"] = autoScoredMiddle
-        auto["scoreDefenses"] = autoScoredDefenses
+        auto["scoreDefenses"]  = autoScoredDefenses
         
         // Score
-        score["scoreHigh"] = scoreHigh
-        score["scoreLow"] = scoreLow
-        score["missedHigh"] = scoreMissedHigh
-        score["missedLow"] = scoreMissedLow
-        score["scoreBatters"] = scoredBatters
+        score["scoreHigh"]      = scoreHigh
+        score["scoreLow"]       = scoreLow
+        score["missedHigh"]     = scoreMissedHigh
+        score["missedLow"]      = scoreMissedLow
+        score["scoreBatters"]   = scoredBatters
         score["scoreCourtyard"] = scoredMiddle
-        score["scoreDefenses"] = scoredDefenses
+        score["scoreDefenses"]  = scoredDefenses
         
         // Defenses
         defense["defense1"] = defense1.propertyListRepresentation()
@@ -333,10 +338,25 @@ class Match : NSObject, NSCoding {
         defense["defense4"] = defense4.propertyListRepresentation()
         defense["defense5"] = defense5.propertyListRepresentation()
         
-        data["team"] = team
-        data["auto"] = auto
-        data["score"] = score
+        // Final Info
+        final["score"]    = finalScore
+        final["rPoints"]  = finalRankingPoints
+        final["result"]   = finalResult.rawValue
+        final["pScore"]   = finalPenaltyScore
+        final["fouls"]    = finalFouls
+        final["tFouls"]   = finalTechFouls
+        final["yCards"]   = finalYellowCards
+        final["rCards"]   = finalRedCards
+        final["robot"]    = finalRobot.rawValue
+        final["config"]   = finalConfiguration.rawValue
+        final["comments"] = finalComments
+        
+        // All Data
+        data["team"]    = team
+        data["auto"]    = auto
+        data["score"]   = score
         data["defense"] = defense
+        data["final"]   = final
         
         return data;
     }

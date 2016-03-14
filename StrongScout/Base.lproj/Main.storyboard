@@ -235,7 +235,7 @@
                         <viewControllerLayoutGuide type="top" id="pSu-bP-HYh"/>
                         <viewControllerLayoutGuide type="bottom" id="hky-nG-z3x"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="Ubv-h8-Dbs">
+                    <view key="view" contentMode="scaleToFill" id="Ubv-h8-Dbs" customClass="UIScrollView">
                         <rect key="frame" x="0.0" y="44" width="600" height="556"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -468,7 +468,7 @@
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Comments:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zIa-P5-peB">
                                                 <rect key="frame" x="0.0" y="0.0" width="560" height="20.5"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="VUL-rx-BbQ">
@@ -506,9 +506,11 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="FinalCommentsTextView" destination="VUL-rx-BbQ" id="0cO-9Y-oKG"/>
                         <outlet property="FinalPenaltyScoreTextField" destination="Nai-qC-IRg" id="GjE-yY-9Xn"/>
                         <outlet property="FinalRankingPointsTextField" destination="nbf-N2-BU4" id="J3q-uY-rVg"/>
                         <outlet property="FinalScoreTextField" destination="ZIV-eJ-DBU" id="7PA-EM-vM4"/>
+                        <outlet property="scrollView" destination="Ubv-h8-Dbs" id="3ki-9g-W1G"/>
                         <outletCollection property="EndingRobotButtons" destination="SA1-5j-b9B" collectionClass="NSMutableArray" id="OSc-zY-tyR"/>
                         <outletCollection property="MatchOutcomeButtons" destination="5dl-2e-dQb" collectionClass="NSMutableArray" id="Cqv-Ff-PNY"/>
                         <outletCollection property="MatchOutcomeButtons" destination="n45-hT-Sju" collectionClass="NSMutableArray" id="xeg-Ge-RzA"/>
@@ -906,7 +908,7 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Bluetooth Advertise:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iHb-TD-naD">
                                 <rect key="frame" x="20" y="40" width="156" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sNO-BC-1kZ">
@@ -918,7 +920,7 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hoo-Aw-T5z">
                                 <rect key="frame" x="20" y="95" width="42" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>

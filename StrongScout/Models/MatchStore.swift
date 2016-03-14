@@ -91,7 +91,6 @@ class MatchStore: NSObject {
         } catch {
             return false
         }
-        
         return true
     }
     
@@ -149,11 +148,12 @@ class MatchStore: NSObject {
             currentMatch?.defenses = [(currentMatch?.defense1)!, (currentMatch?.defense2)!, (currentMatch?.defense3)!, (currentMatch?.defense4)!, (currentMatch?.defense5)!]
             break;
         case .finalStats:
-            currentMatch?.finalScore = match.finalScore
+            currentMatch?.finalScore         = match.finalScore
             currentMatch?.finalRankingPoints = match.finalRankingPoints
-            currentMatch?.finalResult = match.finalResult
-            currentMatch?.finalPenaltyScore = match.finalPenaltyScore
+            currentMatch?.finalResult        = match.finalResult
+            currentMatch?.finalPenaltyScore  = match.finalPenaltyScore
             currentMatch?.finalConfiguration = match.finalConfiguration
+            currentMatch?.finalComments      = match.finalComments
         case .actionsEdited:
             currentMatch?.actionsPerformed = match.actionsPerformed
         default:
@@ -183,7 +183,6 @@ class MatchStore: NSObject {
     
     func aggregateCurrentMatchData() {
         if currentMatch == nil { return }
-        
         currentMatch!.aggregateActionsPerformed()
     }
     
@@ -203,17 +202,10 @@ class MatchStore: NSObject {
                 if(match.isCompleted & 32 == 32) {
                     match.isCompleted ^= 32;
                 }
-                
                 matchData.append(match.messageDictionary())
             }
         }
         
-        
         return try? NSJSONSerialization.dataWithJSONObject(matchData, options: .PrettyPrinted)
     }
-    
-    // MARK: Actions Edit
-    
-    
-    
 }

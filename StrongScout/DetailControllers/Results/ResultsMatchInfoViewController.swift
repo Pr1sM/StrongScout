@@ -21,6 +21,7 @@ class ResultsMatchInfoViewController: UIViewController {
     @IBOutlet weak var finalTechFouls: UILabel!
     @IBOutlet weak var finalYellowCards: UILabel!
     @IBOutlet weak var finalRedCards: UILabel!
+    @IBOutlet weak var finalComments: UILabel!
     
     var match:Match!
     
@@ -47,6 +48,7 @@ class ResultsMatchInfoViewController: UIViewController {
         finalTechFouls.text = "\(match.finalTechFouls)"
         finalYellowCards.text = "\(match.finalYellowCards)"
         finalRedCards.text = "\(match.finalRedCards)"
+        finalComments.text = match.finalComments
     }
 
     override func didReceiveMemoryWarning() {

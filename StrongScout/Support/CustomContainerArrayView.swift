@@ -61,7 +61,9 @@ class CustomContainerArrayView: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        setupViewDataArray()
+        if viewData.count <= 0 {
+            setupViewDataArray()
+        }
     }
     
     func setupViewDataArray() {

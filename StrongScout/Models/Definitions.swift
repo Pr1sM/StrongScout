@@ -364,36 +364,6 @@ struct Action: PropertyListReadable {
     }
 }
 
-
-//struct Action: PropertyListReadable {
-//    var section:SectionType = .tele
-//    var type:ActionType = .unknown
-//    var score:Score = Score()
-//    var defense:DefenseInfo = DefenseInfo()
-//    
-//    init() {
-//    
-//    }
-//    
-//    init?(propertyListRepresentation: NSDictionary?) {
-//        guard let values = propertyListRepresentation else { return nil }
-//        if let t = values["type"] as? Int,
-//           let st = values["section"] as? Int,
-//           let s = values["score"] as? NSDictionary?,
-//           let d = values["defense"] as? NSDictionary? {
-//            self.type = ActionType(rawValue: t)!
-//            self.section = SectionType(rawValue: st)!
-//            self.score = Score(propertyListRepresentation: s)!
-//            self.defense = DefenseInfo(propertyListRepresentation: d)!
-//        }
-//    }
-//    
-//    func propertyListRepresentation() -> NSDictionary {
-//        let representation:[String:AnyObject] = ["type":type.rawValue, "section":section.rawValue, "score":score.propertyListRepresentation(), "defense":defense.propertyListRepresentation()]
-//        return representation
-//    }
-//}
-
 struct ActionEdit {
     var action:Action
     var index:Int

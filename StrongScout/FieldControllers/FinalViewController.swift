@@ -12,26 +12,33 @@ class FinalViewController: UIViewController {
 
     @IBOutlet var EndingRobotButtons: [UIButton]!
     @IBOutlet var EndingButtons: [UIButton]!
-    @IBOutlet var PenaltyButtons: [UIButton]!
     @IBOutlet var MatchOutcomeButtons: [UIButton]!
     @IBOutlet weak var FinalPenaltyScoreTextField: UITextField!
     @IBOutlet weak var FinalRankingPointsTextField: UITextField!
     @IBOutlet weak var FinalScoreTextField: UITextField!
+    @IBOutlet weak var FinalCommentsTextView: UITextView!
+    @IBOutlet weak var scrollView:UIScrollView!
     
     private var match = MatchStore.sharedStore.currentMatch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         let backgroundTap = UITapGestureRecognizer(target: self, action: "backgroundTap:")
         backgroundTap.numberOfTapsRequired = 1
         self.view.addGestureRecognizer(backgroundTap)
+        
+        FinalCommentsTextView.delegate = self
     }
     
     override func viewWillAppear(animated: Bool) {
         match = MatchStore.sharedStore.currentMatch!
-        
+        registerForKeyboardNotifications()
         readyToMoveOn()
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        deregisterForKeyboardNotifications()
     }
 
     override func didReceiveMemoryWarning() {
@@ -43,6 +50,36 @@ class FinalViewController: UIViewController {
         let disable =  match.finalScore < 0 || match.finalPenaltyScore < 0 || match.finalRankingPoints < 0 || match.finalResult == .none
         
         self.navigationItem.rightBarButtonItem?.enabled = !disable
+    }
+    
+    func registerForKeyboardNotifications() {
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWasShown:", name: UIKeyboardDidShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillBeHidden:", name: UIKeyboardWillHideNotification, object: nil)
+    }
+    
+    func deregisterForKeyboardNotifications() {
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardDidShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+    }
+    
+    func keyboardWasShown(notification:NSNotification) {
+        let info = notification.userInfo
+        let kbSize = info![UIKeyboardFrameBeginUserInfoKey]?.CGRectValue.size
+        
+        let edgeInsets = UIEdgeInsetsMake(0.0, 0.0, kbSize!.height, 0.0)
+        scrollView.contentInset = edgeInsets
+        scrollView.scrollIndicatorInsets = edgeInsets
+        
+        if !FinalCommentsTextView.isFirstResponder() { return }
+
+        self.scrollView.setContentOffset(CGPointMake(0.0, kbSize!.height-CGRectGetMaxY(FinalCommentsTextView.frame) + 150), animated: true)
+    }
+    
+    func keyboardWillBeHidden(notification:NSNotification) {
+        let insets = UIEdgeInsetsZero
+        scrollView.contentInset = insets
+        scrollView.scrollIndicatorInsets = insets
+        self.scrollView.contentOffset = CGPointMake(0.0, 0.0)
     }
     
     @IBAction func RobotButtonTap(sender:UIButton) {
@@ -132,6 +169,7 @@ class FinalViewController: UIViewController {
         readyToMoveOn()
         //print("finalScore: \(match.finalScore)")
     }
+    
     @IBAction func FinalRPEndEdit(sender: UITextField) {
         if sender.text?.characters.count > 0 {
             match.finalRankingPoints = (Int(sender.text!) ?? match.finalRankingPoints)!
@@ -141,6 +179,7 @@ class FinalViewController: UIViewController {
         readyToMoveOn()
         //print("finalScore: \(match.finalRankingPoints)")
     }
+    
     @IBAction func FinalPenaltyEndEdit(sender: UITextField) {
         if sender.text?.characters.count > 0 {
             match.finalPenaltyScore = (Int(sender.text!) ?? match.finalPenaltyScore)!
@@ -163,5 +202,11 @@ class FinalViewController: UIViewController {
             MatchStore.sharedStore.finishCurrentMatch()
         }
     }
+}
 
+extension FinalViewController: UITextViewDelegate {
+    func textViewDidChange(textView: UITextView) {
+        match.finalComments = textView.text
+        readyToMoveOn()
+    }
 }

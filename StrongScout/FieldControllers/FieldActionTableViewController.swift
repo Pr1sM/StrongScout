@@ -97,7 +97,7 @@ extension FieldActionTableViewController {
             description = "\(score.type.toString()) from the \(score.location.toString())"
             break
         case let .DefenseData(defense):
-            description = "\(defense.actionPerformed.toString()) on \(defense.type.toString())"
+            description = "\(defense.actionPerformed.toString()) on \(defense.type.toStringResults())"
             break
         case let .PenaltyData(penalty):
             description = "\(penalty.toString()) awarded"
