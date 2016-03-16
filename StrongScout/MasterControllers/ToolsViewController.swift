@@ -85,7 +85,7 @@ class ToolsViewController: UIViewController {
     
     func sendData() {
         if sendingEOM {
-            let didSend = peripheralManager?.updateValue("<EOM>".dataUsingEncoding(NSUTF8StringEncoding)!, forCharacteristic: infoCharacteristic!, onSubscribedCentrals: nil)
+            let didSend = peripheralManager?.updateValue("<EOM>".dataUsingEncoding(NSUTF8StringEncoding)!, forCharacteristic: sendingCharacteristic!, onSubscribedCentrals: nil)
             if didSend == true {
                 sendingEOM = false
                 print("Sent: EOM")
@@ -159,11 +159,11 @@ extension ToolsViewController: CBPeripheralManagerDelegate {
                                                        value: nil,
                                                  permissions: .Readable)
         
-        let infoService = CBMutableService(type: lastUpdateServiceUUID, primary: true)
+        let infoService = CBMutableService(type: lastUpdateServiceUUID, primary: false)
         infoService.characteristics = [infoCharacteristic!]
         
-        let dataService = CBMutableService(type: dataServiceUUID, primary: false)
-        dataService.characteristics = [newDataCharacteristic!, allDataCharacteristic!]
+        let dataService = CBMutableService(type: dataServiceUUID, primary: true)
+        dataService.characteristics = [allDataCharacteristic!]
         
         peripheralManager!.addService(infoService)
         peripheralManager!.addService(dataService)

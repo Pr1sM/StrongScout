@@ -65,7 +65,7 @@ class FieldDefenseSelectionView: UIViewController, UIPopoverPresentationControll
         defenseStack.distribution = .FillEqually
         
         for view in defenseImageViews {
-            view.backgroundColor = themeDarkGray
+            view.backgroundColor = themeDarkGray                                                                                                                                                                                                                                                                                                                                                                           
             view.layer.borderWidth = 1
             defenseStack.addArrangedSubview(view)
         }
