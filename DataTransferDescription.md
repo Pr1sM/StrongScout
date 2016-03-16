@@ -95,208 +95,208 @@ The final class contains information about the results of a match.
 
 ## Example
 
-Here is an example of the formatted transfer message.  After the contents of the message are sent an 'End-of-Message' flag will be sent as well.  This message is a string that contains "<EOM>".  
+Here is an example of the formatted transfer message.  After the contents of the message are sent an 'End-of-Message' flag will be sent as well.  This message is a string that contains "&lt;EOM&gt;".  
 
     [
-    {
-    "team" : {
-    "matchNumber" : 21,
-    "teamNumber" : 123,
-    "alliance" : "Blue"
-    },
-    "defense" : {
-    "defense3" : {
-    "across" : 0,
-    "aacross" : 0,
-    "abcross" : 0,
-    "bcross" : 0,
-    "fcross" : 1,
-    "atcross" : 0,
-    "afcross" : 0,
-    "cross" : 0,
-    "loc" : 3,
-    "type" : 6
-    },
-    "defense4" : {
-    "across" : 0,
-    "aacross" : 0,
-    "abcross" : 0,
-    "bcross" : 1,
-    "fcross" : 0,
-    "atcross" : 0,
-    "afcross" : 0,
-    "cross" : 0,
-    "loc" : 4,
-    "type" : 4
-    },
-    "defense2" : {
-    "across" : 0,
-    "aacross" : 0,
-    "abcross" : 0,
-    "bcross" : 0,
-    "fcross" : 0,
-    "atcross" : 0,
-    "afcross" : 0,
-    "cross" : 0,
-    "loc" : 2,
-    "type" : 8
-    },
-    "defense1" : {
-    "across" : 0,
-    "aacross" : 0,
-    "abcross" : 0,
-    "bcross" : 0,
-    "fcross" : 0,
-    "atcross" : 0,
-    "afcross" : 0,
-    "cross" : 0,
-    "loc" : 1,
-    "type" : 9
-    },
-    "defense5" : {
-    "across" : 0,
-    "aacross" : 0,
-    "abcross" : 0,
-    "bcross" : 0,
-    "fcross" : 0,
-    "atcross" : 2,
-    "afcross" : 0,
-    "cross" : 0,
-    "loc" : 5,
-    "type" : 2
-    }
-    },
-    "final" : {
-    "yCards" : 0,
-    "robot" : 3,
-    "fouls" : 1,
-    "result" : 2,
-    "score" : 130,
-    "config" : 1,
-    "rCards" : 0,
-    "comments" : "Good robot, a little unstable though...",
-    "rPoints" : 2,
-    "pScore" : 24,
-    "tFouls" : 0
-    },
-    "auto" : {
-    "scoreCourtyard" : 0,
-    "scoreBatters" : 0,
-    "missedLow" : 0,
-    "scoreLow" : 0,
-    "scoreDefenses" : 0,
-    "missedHigh" : 0,
-    "scoreHigh" : 0
-    },
-    "score" : {
-    "scoreCourtyard" : 0,
-    "scoreBatters" : 1,
-    "missedLow" : 1,
-    "scoreLow" : 0,
-    "scoreDefenses" : 0,
-    "missedHigh" : 1,
-    "scoreHigh" : 2
-    }
-    },
-    {
-    "team" : {
-    "matchNumber" : 2,
-    "teamNumber" : 243,
-    "alliance" : "Red"
-    },
-    "defense" : {
-    "defense3" : {
-    "across" : 0,
-    "aacross" : 0,
-    "abcross" : 0,
-    "bcross" : 0,
-    "fcross" : 0,
-    "atcross" : 0,
-    "afcross" : 0,
-    "cross" : 1,
-    "loc" : 3,
-    "type" : 2
-    },
-    "defense4" : {
-    "across" : 0,
-    "aacross" : 0,
-    "abcross" : 0,
-    "bcross" : 1,
-    "fcross" : 0,
-    "atcross" : 0,
-    "afcross" : 0,
-    "cross" : 0,
-    "loc" : 4,
-    "type" : 3
-    },
-    "defense2" : {
-    "across" : 0,
-    "aacross" : 0,
-    "abcross" : 0,
-    "bcross" : 0,
-    "fcross" : 0,
-    "atcross" : 0,
-    "afcross" : 0,
-    "cross" : 0,
-    "loc" : 2,
-    "type" : 5
-    },
-    "defense1" : {
-    "across" : 0,
-    "aacross" : 0,
-    "abcross" : 0,
-    "bcross" : 0,
-    "fcross" : 0,
-    "atcross" : 1,
-    "afcross" : 0,
-    "cross" : 0,
-    "loc" : 1,
-    "type" : 9
-    },
-    "defense5" : {
-    "across" : 0,
-    "aacross" : 0,
-    "abcross" : 0,
-    "bcross" : 0,
-    "fcross" : 0,
-    "atcross" : 0,
-    "afcross" : 0,
-    "cross" : 1,
-    "loc" : 5,
-    "type" : 8
-    }
-    },
-    "final" : {
-    "yCards" : 1,
-    "robot" : 1,
-    "fouls" : 1,
-    "result" : 3,
-    "score" : 43,
-    "config" : 1,
-    "rCards" : 0,
-    "comments" : "Okay robot,  no defensive abilities.",
-    "rPoints" : 2,
-    "pScore" : 34,
-    "tFouls" : 0
-    },
-    "auto" : {
-    "scoreCourtyard" : 0,
-    "scoreBatters" : 2,
-    "missedLow" : 0,
-    "scoreLow" : 0,
-    "scoreDefenses" : 2,
-    "missedHigh" : 2,
-    "scoreHigh" : 2
-    },
-    "score" : {
-    "scoreCourtyard" : 0,
-    "scoreBatters" : 2,
-    "missedLow" : 2,
-    "scoreLow" : 0,
-    "scoreDefenses" : 1,
-    "missedHigh" : 2,
-    "scoreHigh" : 1
-    }
-    }
+        {
+            "team" : {
+                "matchNumber" : 21,
+                "teamNumber" : 123,
+                "alliance" : "Blue"
+            },
+            "defense" : {
+                "defense3" : {
+                    "across" : 0,
+                    "aacross" : 0,
+                    "abcross" : 0,
+                    "bcross" : 0,
+                    "fcross" : 1,
+                    "atcross" : 0,
+                    "afcross" : 0,
+                    "cross" : 0,
+                    "loc" : 3,
+                    "type" : 6
+                },
+                "defense4" : {
+                    "across" : 0,
+                    "aacross" : 0,
+                    "abcross" : 0,
+                    "bcross" : 1,
+                    "fcross" : 0,
+                    "atcross" : 0,
+                    "afcross" : 0,
+                    "cross" : 0,
+                    "loc" : 4,
+                    "type" : 4
+                },
+                "defense2" : {
+                    "across" : 0,
+                    "aacross" : 0,
+                    "abcross" : 0,
+                    "bcross" : 0,
+                    "fcross" : 0,
+                    "atcross" : 0,
+                    "afcross" : 0,
+                    "cross" : 0,
+                    "loc" : 2,
+                    "type" : 8
+                },
+                "defense1" : {
+                    "across" : 0,
+                    "aacross" : 0,
+                    "abcross" : 0,
+                    "bcross" : 0,
+                    "fcross" : 0,
+                    "atcross" : 0,
+                    "afcross" : 0,
+                    "cross" : 0,
+                    "loc" : 1,
+                    "type" : 9
+                },
+                "defense5" : {
+                    "across" : 0,
+                    "aacross" : 0,
+                    "abcross" : 0,
+                    "bcross" : 0,
+                    "fcross" : 0,
+                    "atcross" : 2,
+                    "afcross" : 0,
+                    "cross" : 0,
+                    "loc" : 5,
+                    "type" : 2
+                }
+            },
+            "final" : {
+                "yCards" : 0,
+                "robot" : 3,
+                "fouls" : 1,
+                "result" : 2,
+                "score" : 130,
+                "config" : 1,
+                "rCards" : 0,
+                "comments" : "Good robot, a little unstable though...",
+                "rPoints" : 2,
+                "pScore" : 24,
+                "tFouls" : 0
+            },
+            "auto" : {
+                "scoreCourtyard" : 0,
+                "scoreBatters" : 0,
+                "missedLow" : 0,
+                "scoreLow" : 0,
+                "scoreDefenses" : 0,
+                "missedHigh" : 0,
+                "scoreHigh" : 0
+            },
+            "score" : {
+                "scoreCourtyard" : 0,
+                "scoreBatters" : 1,
+                "missedLow" : 1,
+                "scoreLow" : 0,
+                "scoreDefenses" : 0,
+                "missedHigh" : 1,
+                "scoreHigh" : 2
+            }
+        },
+        {
+            "team" : {
+                "matchNumber" : 2,
+                "teamNumber" : 243,
+                "alliance" : "Red"
+            },
+            "defense" : {
+                "defense3" : {
+                    "across" : 0,
+                    "aacross" : 0,
+                    "abcross" : 0,
+                    "bcross" : 0,
+                    "fcross" : 0,
+                    "atcross" : 0,
+                    "afcross" : 0,
+                    "cross" : 1,
+                    "loc" : 3,
+                    "type" : 2
+                },
+                "defense4" : {
+                    "across" : 0,
+                    "aacross" : 0,
+                    "abcross" : 0,
+                    "bcross" : 1,
+                    "fcross" : 0,
+                    "atcross" : 0,
+                    "afcross" : 0,
+                    "cross" : 0,
+                    "loc" : 4,
+                    "type" : 3
+                },
+                "defense2" : {
+                    "across" : 0,
+                    "aacross" : 0,
+                    "abcross" : 0,
+                    "bcross" : 0,
+                    "fcross" : 0,
+                    "atcross" : 0,
+                    "afcross" : 0,
+                    "cross" : 0,
+                    "loc" : 2,
+                    "type" : 5
+                },
+                "defense1" : {
+                    "across" : 0,
+                    "aacross" : 0,
+                    "abcross" : 0,
+                    "bcross" : 0,
+                    "fcross" : 0,
+                    "atcross" : 1,
+                    "afcross" : 0,
+                    "cross" : 0,
+                    "loc" : 1,
+                    "type" : 9
+                },
+                "defense5" : {
+                    "across" : 0,
+                    "aacross" : 0,
+                    "abcross" : 0,
+                    "bcross" : 0,
+                    "fcross" : 0,
+                    "atcross" : 0,
+                    "afcross" : 0,
+                    "cross" : 1,
+                    "loc" : 5,
+                    "type" : 8
+                }
+            },
+            "final" : {
+                "yCards" : 1,
+                "robot" : 1,
+                "fouls" : 1,
+                "result" : 3,
+                "score" : 43,
+                "config" : 1,
+                "rCards" : 0,
+                "comments" : "Okay robot,  no defensive abilities.",
+                "rPoints" : 2,
+                "pScore" : 34,
+                "tFouls" : 0
+            },
+            "auto" : {
+                "scoreCourtyard" : 0,
+                "scoreBatters" : 2,
+                "missedLow" : 0,
+                "scoreLow" : 0,
+                "scoreDefenses" : 2,
+                "missedHigh" : 2,
+                "scoreHigh" : 2
+            },
+            "score" : {
+                "scoreCourtyard" : 0,
+                "scoreBatters" : 2,
+                "missedLow" : 2,
+                "scoreLow" : 0,
+                "scoreDefenses" : 1,
+                "missedHigh" : 2,
+                "scoreHigh" : 1
+            }
+        }
     ]
     <EOM>
