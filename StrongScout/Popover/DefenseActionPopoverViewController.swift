@@ -11,10 +11,10 @@ import UIKit
 class DefenseActionPopoverViewController: UIViewController {
     @IBOutlet var actionButtons: [UIButton]!
     
-    // Crossed         = bit 0 = 1 = 0b0001
-    // Attempted Cross = bit 1 = 2 = 0b0010
-    // Crossed w/ Ball = bit 2 = 4 = 0b0100
-    // Assisted        = bit 3 = 8 = 0b1000
+    // Crossed         = 1
+    // Attempted Cross = 2
+    // Crossed w/ Ball = 3
+    // Assisted        = 4
     var buttonState:Int = 0
     var defense:DefenseType = .unknown
     var section:SectionType = .tele
@@ -31,19 +31,9 @@ class DefenseActionPopoverViewController: UIViewController {
     }
     
     @IBAction func actionButtonTap(sender: UIButton) {
-        let bit = sender.tag
-        if sender.selected {
-            buttonState = 0
-        } else {
-            buttonState = 1 << bit
-        }
-        
+        buttonState = sender.selected ? 0 : sender.tag
         for b in actionButtons {
-            if buttonState == 1 << b.tag {
-                b.selected = true
-            } else {
-                b.selected = false
-            }
+            b.selected = buttonState == sender.tag
         }
     }
 }
@@ -60,7 +50,7 @@ extension DefenseActionPopoverViewController: UIPopoverPresentationControllerDel
         
         var defenseInfo = DefenseInfo()
         defenseInfo.type = defense
-        defenseInfo.actionPerformed = DefenseAction(rawValue: buttonState)
+        defenseInfo.actionPerformed = DefenseAction(rawValue: buttonState)!
         var action = Action()
         action.section = section
         action.type = .defense

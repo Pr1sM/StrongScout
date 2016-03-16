@@ -7,12 +7,15 @@
 //
 
 import Foundation
+import UIKit
 
+// MARK: PropertyListReadable Protocol
 protocol PropertyListReadable {
     func propertyListRepresentation() -> NSDictionary
     init?(propertyListRepresentation:NSDictionary?)
 }
 
+// MARK: DefenseType
 enum DefenseType:Int {
     case unknown = 0, portcullis, chevaldefrise, moat, ramparts, drawbridge, sallyport, rockwall, roughterrain, lowbar
     
@@ -52,38 +55,43 @@ enum DefenseType:Int {
     }
 }
 
-struct ScoreType: OptionSetType {
-    let rawValue:Int
-    
-    static let Unknown = ScoreType(rawValue: 0)
-    static let MissedHigh = ScoreType(rawValue: 1 << 0)
-    static let High = ScoreType(rawValue: 1 << 1)
-    static let MissedLow = ScoreType(rawValue: 1 << 2)
-    static let Low = ScoreType(rawValue: 1 << 3)
+// MARK: ScoreType
+enum ScoreType: Int {
+    case Unknown = 0, MissedHigh, High, MissedLow, Low
     
     func toString() -> String {
         return (self == .High)        ? "Scored High Goal" :
-               (self == .Low)         ? "Scored Low Goal "  :
-               (self == .MissedHigh)  ? "Missed High Goal"  :
+               (self == .Low)         ? "Scored Low Goal " :
+               (self == .MissedHigh)  ? "Missed High Goal" :
                (self == .MissedLow)   ? "Missed Low Goal"  : "Unknown"
     }
 }
 
-struct ScoreLocation: OptionSetType {
-    let rawValue:Int
-    
-    static let Unknown   = ScoreLocation(rawValue: 0)
-    static let Batter    = ScoreLocation(rawValue: 1 << 0)
-    static let Courtyard = ScoreLocation(rawValue: 1 << 1)
-    static let Defenses  = ScoreLocation(rawValue: 1 << 2)
+// MARK: ScoreLocation
+enum ScoreLocation: Int {
+    case Unknown = 0, Batter, Courtyard, Defenses
     
     func toString() -> String {
-        return (rawValue == 1) ? "Batter"    :
-               (rawValue == 2) ? "Courtyard" :
-               (rawValue == 4) ? "Defenses"  : "Unknown"
+        return (self == .Batter)    ? "Batter"    :
+               (self == .Courtyard) ? "Courtyard" :
+               (self == .Defenses)  ? "Defenses"  : "Unknown"
     }
 }
 
+// MARK: FieldLayoutType
+enum FieldLayoutType: Int {
+    case BlueRed = 0, RedBlue
+    
+    mutating func reverse() {
+        self = self == .BlueRed ? .RedBlue : .BlueRed
+    }
+    
+    func getImage() -> UIImage {
+        return self == .BlueRed ? UIImage(named: "fieldLayoutBlueRed")! : UIImage(named: "fieldLayoutRedBlue")!
+    }
+}
+
+// MARK: AllianceType
 enum AllianceType : Int {
     case unknown = 0, blue, red
     
@@ -92,6 +100,7 @@ enum AllianceType : Int {
     }
 }
 
+// MARK: ActionType
 enum ActionType : Int {
     case unknown = 0, score, defense, penalty
     
@@ -102,6 +111,7 @@ enum ActionType : Int {
     }
 }
 
+// MARK: EditType
 enum EditType : Int {
     case Delete = 0, Add
     
@@ -110,6 +120,7 @@ enum EditType : Int {
     }
 }
 
+// MARK: SectionType
 enum SectionType : Int {
     case auto = 0, tele
     
@@ -118,23 +129,19 @@ enum SectionType : Int {
     }
 }
 
-struct DefenseAction: OptionSetType {
-    let rawValue:Int
-    
-    static let None            = DefenseAction(rawValue: 0)
-    static let Crossed         = DefenseAction(rawValue: 1 << 0)
-    static let AttemptedCross  = DefenseAction(rawValue: 1 << 1)
-    static let CrossedWithBall = DefenseAction(rawValue: 1 << 2)
-    static let AssistedCross   = DefenseAction(rawValue: 1 << 3)
+// MARK: DefenseAction
+enum DefenseAction: Int {
+    case None = 0, Crossed, AttemptedCross, CrossedWithBall, AssistedCross
     
     func toString() -> String {
-        return (rawValue == 1) ? "Crossed"             :
-               (rawValue == 2) ? "Attempted Cross"     :
-               (rawValue == 4) ? "Crossed With Ball"   :
-               (rawValue == 8) ? "Assisted With Cross" : "None"
+        return (self == .Crossed)         ? "Crossed"             :
+               (self == .AttemptedCross)  ? "Attempted Cross"     :
+               (self == .CrossedWithBall) ? "Crossed With Ball"   :
+               (self == .AssistedCross)   ? "Assisted With Cross" : "None"
     }
 }
 
+// MARK: FinalConfigType
 enum FinalConfigType : Int {
     case none = 0, hang, challenge
     
@@ -144,6 +151,7 @@ enum FinalConfigType : Int {
     }
 }
 
+// MARK: ResultType
 enum ResultType : Int {
     case none = 0, loss, win, tie, noShow
     
@@ -155,10 +163,12 @@ enum ResultType : Int {
     }
 }
 
+// MARK: UpdateType
 enum UpdateType : Int {
     case none = 0, teamInfo, fieldSetup, finalStats, actionsEdited
 }
 
+// MARK: PenaltyType
 enum PenaltyType : Int {
     case None = 0, Foul, TechFoul, YellowCard, RedCard
     
@@ -170,6 +180,7 @@ enum PenaltyType : Int {
     }
 }
 
+// MARK: RobotState
 struct RobotState:OptionSetType {
     let rawValue:Int
     
@@ -191,6 +202,7 @@ struct RobotState:OptionSetType {
     }
 }
 
+// MARK: Defense
 struct Defense: PropertyListReadable {
     var type:DefenseType = .unknown
     var location:Int = 0
@@ -262,8 +274,7 @@ struct Defense: PropertyListReadable {
     }
 }
 
-
-
+// MARK: Score
 struct Score: PropertyListReadable {
     var type:ScoreType = .Unknown
     var location:ScoreLocation = .Unknown
@@ -275,8 +286,8 @@ struct Score: PropertyListReadable {
     init?(propertyListRepresentation: NSDictionary?) {
         guard let values = propertyListRepresentation else { return nil }
         if let t = values["type"] as? Int, let l = values["loc"] as? Int {
-            self.type = ScoreType(rawValue: t)
-            self.location = ScoreLocation(rawValue: l)
+            self.type = ScoreType(rawValue: t)!
+            self.location = ScoreLocation(rawValue: l)!
         }
     }
     
@@ -286,6 +297,7 @@ struct Score: PropertyListReadable {
     }
 }
 
+// MARK: DefenseInfo
 struct DefenseInfo: PropertyListReadable {
     var type:DefenseType = .unknown
     var actionPerformed:DefenseAction = .None
@@ -298,7 +310,7 @@ struct DefenseInfo: PropertyListReadable {
         guard let values = propertyListRepresentation else { return nil }
         if let t = values["type"] as? Int, let a = values["action"] as? Int {
             self.type = DefenseType(rawValue: t)!
-            self.actionPerformed = DefenseAction(rawValue: a)
+            self.actionPerformed = DefenseAction(rawValue: a)!
         }
     }
     
@@ -308,6 +320,7 @@ struct DefenseInfo: PropertyListReadable {
     }
 }
 
+// MARK: ActionData
 enum ActionData: PropertyListReadable {
     case None
     case ScoreData(Score)
@@ -341,6 +354,7 @@ enum ActionData: PropertyListReadable {
     }
 }
 
+// MARK: Action
 struct Action: PropertyListReadable {
     var section:SectionType = .tele
     var type:ActionType = .unknown
@@ -364,6 +378,7 @@ struct Action: PropertyListReadable {
     }
 }
 
+// MARK: ActionEdit
 struct ActionEdit {
     var action:Action
     var index:Int
@@ -376,6 +391,7 @@ struct ActionEdit {
     }
 }
 
+// MARK: Stack
 struct Stack<Element> {
     private var items = [Element]()
     private var limit:Int

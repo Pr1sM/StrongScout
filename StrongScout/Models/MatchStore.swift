@@ -15,6 +15,7 @@ class MatchStore: NSObject {
     var allMatches:[Match]? = []
     var currentMatchIndex = -1
     var currentMatch:Match?
+    var fieldLayout:FieldLayoutType = .BlueRed
     
     // Action Edit
     
@@ -34,6 +35,8 @@ class MatchStore: NSObject {
         }
         
         let currentMatchData = NSUserDefaults.standardUserDefaults().objectForKey("StrongScout.currentMatch") as? NSData
+        let fieldLayout = NSUserDefaults.standardUserDefaults().integerForKey("StrongScout.fieldLayout")
+        self.fieldLayout = FieldLayoutType(rawValue: fieldLayout)!
         
         if currentMatchData == nil {
             currentMatch = nil
@@ -56,7 +59,7 @@ class MatchStore: NSObject {
         if !self.writeCSVFile() {
             return false
         }
-        
+        NSUserDefaults.standardUserDefaults().setInteger(fieldLayout.rawValue, forKey: "StrongScout.fieldLayout")
         saveCurrentMatch()
         
         let path = self.matchArchivePath()

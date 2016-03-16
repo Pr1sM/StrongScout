@@ -9,18 +9,39 @@
 import UIKit
 
 class FieldDataEntryView: UIViewController {
-    @IBOutlet weak var firstDefense:UIImageView!
-    @IBOutlet weak var secondDefense:UIImageView!
-    @IBOutlet weak var thirdDefense:UIImageView!
-    @IBOutlet weak var fourthDefense:UIImageView!
-    @IBOutlet weak var fifthDefense:UIImageView!
-    @IBOutlet weak var sectionSelection:UISegmentedControl!
-    @IBOutlet weak var goal:UIImageView!
+    var firstDefense:UIImageView!
+    var secondDefense:UIImageView!
+    var thirdDefense:UIImageView!
+    var fourthDefense:UIImageView!
+    var fifthDefense:UIImageView!
+    var goal:UIImageView!
+    
+    var sectionSelection:UISegmentedControl!
+    
+    @IBOutlet weak var leftStack:UIStackView!
+    @IBOutlet weak var rightStack:UIStackView!
+    
+    var type1:Bool = true
     
     var match:Match!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        firstDefense = UIImageView(frame: CGRectZero)
+        secondDefense = UIImageView(frame: CGRectZero)
+        thirdDefense = UIImageView(frame: CGRectZero)
+        fourthDefense = UIImageView(frame: CGRectZero)
+        fifthDefense = UIImageView(frame: CGRectZero)
+        firstDefense.contentMode = .ScaleAspectFit
+        secondDefense.contentMode = .ScaleAspectFit
+        thirdDefense.contentMode = .ScaleAspectFit
+        fourthDefense.contentMode = .ScaleAspectFit
+        fifthDefense.contentMode = .ScaleAspectFit
+        
+        let goalImage = UIImage(named: "goal")!
+        goal = UIImageView(image: goalImage)
+        goal.contentMode = .ScaleAspectFit
 
         let firstDefenseTap = UITapGestureRecognizer(target: self, action: "firstDefenseTap:")
         firstDefense.addGestureRecognizer(firstDefenseTap)
@@ -45,14 +66,30 @@ class FieldDataEntryView: UIViewController {
         let goalTap = UITapGestureRecognizer(target: self, action: "goalTap:")
         goal.addGestureRecognizer(goalTap)
         goal.userInteractionEnabled = true
-        
+    
         match = MatchStore.sharedStore.currentMatch
+        
+        leftStack.axis = .Vertical
+        leftStack.distribution = .FillEqually
+        leftStack.alignment = .Fill
+        leftStack.spacing = 20
+        
+        rightStack.axis = .Vertical
+        rightStack.distribution = .FillEqually
+        rightStack.alignment = .Fill
+        rightStack.spacing = 20
+        
+        sectionSelection = UISegmentedControl(items: ["Autonomous", "Telelop"])
+        sectionSelection.selectedSegmentIndex = 0
+        sectionSelection.tintColor = UIColor(red: 1.0, green: 0.40, blue: 0, alpha: 1.0)
+        sectionSelection.setContentHuggingPriority(750, forAxis: .Vertical)
+        sectionSelection.addTarget(self, action: "sectionChange:", forControlEvents: .ValueChanged)
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        setupImageViews()
+        self.view.backgroundColor = themeGray
         
         if(match.isCompleted & 1 == 0) {
             self.performSegueWithIdentifier("SegueToMatchSetup", sender: self)
@@ -62,6 +99,11 @@ class FieldDataEntryView: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func sectionChange(sender:UISegmentedControl) {
+        let auto = sender.selectedSegmentIndex == 0
+        self.view.backgroundColor = auto ? themeGray : themeDarkGray
     }
     
     func firstDefenseTap(sender:UIGestureRecognizer) {
@@ -101,7 +143,7 @@ class FieldDataEntryView: UIViewController {
         navControl.preferredContentSize = CGSize(width: 372, height: 198)
         
         let popover = navControl.popoverPresentationController
-        popover?.permittedArrowDirections = .Right
+        popover?.permittedArrowDirections = type1 ? .Right : .Left
         popover?.delegate = dact
         popover?.sourceView = imageView
         popover?.sourceRect = imageView.bounds
@@ -138,7 +180,7 @@ class FieldDataEntryView: UIViewController {
         goal.navigationItem.title = title
         
         let popover = navControl.popoverPresentationController
-        popover?.permittedArrowDirections = .Left
+        popover?.permittedArrowDirections = type1 ? .Left : .Right
         popover?.delegate = goal
         popover?.sourceView = self.goal
         popover?.sourceRect = sourceRect
@@ -151,6 +193,19 @@ class FieldDataEntryView: UIViewController {
         thirdDefense.image  = UIImage(named: (match?.defense3.type.toString())!)
         fourthDefense.image = UIImage(named: (match?.defense4.type.toString())!)
         fifthDefense.image  = UIImage(named: (match?.defense5.type.toString())!)
+        
+        let goalStack = type1 ? leftStack : rightStack
+        let defenseStack = type1 ? rightStack : leftStack
+        
+        if defenseStack.subviews.count > 0 { return }
+        let dViews = (type1) ? [fifthDefense, fourthDefense, thirdDefense, secondDefense, firstDefense] : [firstDefense, secondDefense, thirdDefense, fourthDefense, fifthDefense]
+        for view in dViews {
+            defenseStack.addArrangedSubview(view)
+        }
+        
+        goalStack.distribution = .FillProportionally
+        goalStack.addArrangedSubview(sectionSelection)
+        goalStack.addArrangedSubview(goal)
     }
     
     @IBAction func addFoulTap(sender:UIBarButtonItem) {
@@ -170,6 +225,10 @@ class FieldDataEntryView: UIViewController {
     
     @IBAction func unwindToFieldDataEntryView(sender:UIStoryboardSegue) {
         match = MatchStore.sharedStore.currentMatch!
+        
+        type1 = (match.alliance == .blue && MatchStore.sharedStore.fieldLayout == .BlueRed) ||
+                (match.alliance == .red  && MatchStore.sharedStore.fieldLayout == .RedBlue)
+        
         setupImageViews()
     }
 }

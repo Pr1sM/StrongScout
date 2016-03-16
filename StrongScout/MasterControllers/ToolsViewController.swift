@@ -11,6 +11,8 @@ import CoreBluetooth
 
 class ToolsViewController: UIViewController {
     
+    @IBOutlet weak var fieldLayout:UIImageView!
+    
     private var peripheralManager:CBPeripheralManager?
     private var infoCharacteristic:CBMutableCharacteristic?
     private var newDataCharacteristic:CBMutableCharacteristic?
@@ -28,10 +30,16 @@ class ToolsViewController: UIViewController {
 
         // Do any additional setup after loading the view.
         peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
+        
+        fieldLayout.userInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: "fieldLayoutTap:")
+        fieldLayout.addGestureRecognizer(tap)
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        
+        fieldLayout.image = MatchStore.sharedStore.fieldLayout.getImage()
         
         adSwitch.on = false
     }
@@ -46,6 +54,15 @@ class ToolsViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func fieldLayoutTap(sender:UITapGestureRecognizer) {
+        MatchStore.sharedStore.fieldLayout.reverse()
+        NSUserDefaults.standardUserDefaults().setInteger(MatchStore.sharedStore.fieldLayout.rawValue, forKey: "StrongScout.fieldLayout")
+        let image = MatchStore.sharedStore.fieldLayout.getImage()
+        UIView.transitionWithView(fieldLayout, duration: 0.2, options: .TransitionCrossDissolve, animations: {[weak self] in
+            self?.fieldLayout.image = image
+        }, completion: nil)
     }
     
     @IBAction func startAdvertising(sender:UISwitch) {

@@ -13,48 +13,28 @@ class GoalSelectionPopoverViewController: UIViewController {
     @IBOutlet var goalButtons: [UIButton]!
     @IBOutlet var locationButtons: [UIButton]!
     
-    // Missed    = bit 0 = 1 = 0b0001
-    // Completed = bit 1 = 2 = 0b0010
+    // Missed    = 1
+    // Completed = 2
     var goalState:Int = 0
     
-    // Batter    = bit 0 = 1 = 0b0001
-    // Courtyard = bit 1 = 2 = 0b0010
-    // Defenses  = bit 2 = 4 = 0b0100
+    // Batter    = 1
+    // Courtyard = 2
+    // Defenses  = 3
     var locationState:Int = 0
     var lowGoal:Bool = true
     var section:SectionType = .tele
     
     @IBAction func goalTap(sender: UIButton) {
-        let bit = sender.tag
-        if sender.selected {
-            goalState = 0
-        } else {
-            goalState = 1 << bit
-        }
-        
+        goalState = sender.selected ? 0 : sender.tag
         for b in goalButtons {
-            if goalState == 1 << b.tag {
-                b.selected = true
-            } else {
-                b.selected = false
-            }
+            b.selected = goalState == b.tag
         }
     }
     
     @IBAction func locationTap(sender: UIButton) {
-        let bit = sender.tag
-        if sender.selected {
-            locationState = 0
-        } else {
-            locationState = 1 << bit
-        }
-        
+        locationState = sender.selected ? 0 : sender.tag
         for b in locationButtons {
-            if locationState == 1 << b.tag {
-                b.selected = true
-            } else {
-                b.selected = false
-            }
+            b.selected = locationState == b.tag
         }
     }
 }
@@ -67,8 +47,8 @@ extension GoalSelectionPopoverViewController: UIPopoverPresentationControllerDel
     func popoverPresentationControllerDidDismissPopover(popoverPresentationController: UIPopoverPresentationController) {
         if locationState == 0 && goalState == 0 { return }
         var score = Score()
-        score.type = ScoreType(rawValue: goalState << ((lowGoal) ? 2 : 0))
-        score.location = ScoreLocation(rawValue: locationState)
+        score.type = ScoreType(rawValue: goalState + ((lowGoal) ? 2 : 0))!
+        score.location = ScoreLocation(rawValue: locationState)!
         var action = Action()
         action.type = .score
         action.section = section

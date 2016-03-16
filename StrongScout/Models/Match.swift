@@ -39,11 +39,11 @@ class Match : NSObject, NSCoding {
     
     // Defense Info
     
-    var defense1 = Defense()
+    var defense1 = Defense(withDefenseType: .lowbar)
     var defense2 = Defense()
     var defense3 = Defense()
     var defense4 = Defense()
-    var defense5 = Defense(withDefenseType: .lowbar)
+    var defense5 = Defense()
     lazy var defenses:[Defense] = [self.defense1, self.defense2, self.defense3, self.defense4, self.defense5]
     
     // Action Info
