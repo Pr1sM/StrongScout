@@ -82,6 +82,9 @@ class ToolsViewController: UIViewController {
         }
     }
     
+    @IBAction func getEventList(sender:UIButton) {
+        SessionStore.sharedStore.getEventList(self)
+    }
     
     func sendData() {
         if sendingEOM {
@@ -191,5 +194,20 @@ extension ToolsViewController: CBPeripheralManagerDelegate {
         if let error = error {
             print(error)
         }
+    }
+}
+
+extension ToolsViewController: SessionStoreDelegate {
+    func sessionStore(progress: Double, forDownloadTask task: NSURLSessionDownloadTask) {
+        print("Progress for event list: \(progress)")
+    }
+    
+    func sessionStoreCompleted(DownloadTask task: NSURLSessionDownloadTask, toURL location: NSURL, withDictionary result: [String : AnyObject]?) {
+        print("Download Completed")
+        //print("\(result)")
+        
+        let events = result!["Events"] as! [AnyObject]
+        
+        print(events)
     }
 }

@@ -863,7 +863,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="FjZ-1l-gjr">
-                                <rect key="frame" x="20" y="20" width="560" height="319.5"/>
+                                <rect key="frame" x="20" y="20" width="560" height="369.5"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YCX-WQ-VRf">
                                         <rect key="frame" x="0.0" y="0.0" width="560" height="31"/>
@@ -892,7 +892,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="fieldLayoutBlueRed" translatesAutoresizingMaskIntoConstraints="NO" id="hz8-yY-Sz4">
-                                                <rect key="frame" x="0.0" y="28" width="560" height="240"/>
+                                                <rect key="frame" x="0.0" y="28.5" width="560" height="240"/>
                                                 <color key="tintColor" red="1" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="hz8-yY-Sz4" secondAttribute="height" multiplier="7:3" id="82Z-07-rrx"/>
@@ -900,6 +900,13 @@
                                             </imageView>
                                         </subviews>
                                     </stackView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gDW-Yr-yHg">
+                                        <rect key="frame" x="0.0" y="339.5" width="560" height="30"/>
+                                        <state key="normal" title="Get Event List"/>
+                                        <connections>
+                                            <action selector="getEventList:" destination="lX5-0I-3Pw" eventType="touchUpInside" id="qDM-pq-x9G"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                             </stackView>
                         </subviews>
