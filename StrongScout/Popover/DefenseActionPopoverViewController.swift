@@ -33,7 +33,7 @@ class DefenseActionPopoverViewController: UIViewController {
     @IBAction func actionButtonTap(sender: UIButton) {
         buttonState = sender.selected ? 0 : sender.tag
         for b in actionButtons {
-            b.selected = buttonState == sender.tag
+            b.selected = buttonState == b.tag
         }
     }
 }
