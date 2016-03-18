@@ -7,10 +7,25 @@
 //
 
 import UIKit
+import SwiftyJSON
 
-@objc
-protocol SessionStoreDelegate {
-    func sessionStoreCompleted(DownloadTask task:NSURLSessionDownloadTask, toURL location:NSURL, withDictionary result:[String:AnyObject]?)
+enum RequestType: Int {
+    case None = 0, EventList, ScheduleList
+    
+    var url : String {
+        switch(self) {
+        case .EventList:
+            return "https://frc-api.firstinspires.org/v2.0/2016/events?exludeDistrict=false"
+        case .ScheduleList:
+            return "https://frc-api.firstinspires.org/v2.0/2016/schedule/\(ScheduleStore.sharedStore.currentSchedule!)?tournamentLevel=qual"
+        default:
+            return ""
+        }
+    }
+}
+
+protocol SessionStoreDelegate: class {
+    func sessionStoreCompleted(request:RequestType, withData data:NSData?)
     func sessionStore(progress:Double, forDownloadTask task:NSURLSessionDownloadTask)
 }
 
@@ -20,33 +35,35 @@ class SessionStore: NSObject {
     private weak var delegate:SessionStoreDelegate?
     
     private var sessionConfig:NSURLSessionConfiguration!
+    private var currentRequest:RequestType = .None
     
     private override init() {
         super.init()
         
         sessionConfig = NSURLSessionConfiguration.defaultSessionConfiguration()
         
-        sessionConfig.HTTPAdditionalHeaders = ["Accept":"application/json",
-            "Authorization":"Basic bmNrczNUMDUyNToxODlCOEMzNi04MDJELTQ4RjYtQUFBMS1COTFDOEZGMjYwNjg="]
+        sessionConfig.HTTPAdditionalHeaders = ["Accept":"application/json", "Authorization":"Basic UHJpc006MTFEQTAwRDAtNUQ4Ri00RUUxLTg2OTItNDI4MEI4RENBQjFB"]
         sessionConfig.HTTPMaximumConnectionsPerHost = 1
         sessionConfig.timeoutIntervalForRequest = 30.0
     }
     
-    func convertJSONToDictionary(data:NSData?) -> [String:AnyObject]? {
-        if let d = data {
-            return try? NSJSONSerialization.JSONObjectWithData(d, options: .AllowFragments) as! [String: AnyObject]
-        }
-        
-        return nil
-    }
+//    func getEventList(delegate:SessionStoreDelegate?) {
+//        self.delegate = delegate
+//        let url = NSURL(string: "https://frc-api.firstinspires.org/v2.0/2016/events?exludeDistrict=false")!
+//        let session = NSURLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
+//        let request = NSMutableURLRequest(URL: url)
+//        let task = session.downloadTaskWithRequest(request)
+//        
+//        task.resume()
+//    }
     
-    func getEventList(delegate:SessionStoreDelegate?) {
+    func runRequest(type:RequestType, withDelegate delegate:SessionStoreDelegate?) {
         self.delegate = delegate
-        let url = NSURL(string: "https://frc-api.firstinspires.org/v2.0/2016/events?exludeDistrict=false")!
+        self.currentRequest = type
+        let url = NSURL(string: self.currentRequest.url)!
         let session = NSURLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
         let request = NSMutableURLRequest(URL: url)
         let task = session.downloadTaskWithRequest(request)
-        
         task.resume()
     }
 }
@@ -76,8 +93,9 @@ extension SessionStore: NSURLSessionDownloadDelegate {
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
         if let d = delegate {
             let data = NSData(contentsOfURL: location)
-            let dictionary = convertJSONToDictionary(data)
-            d.sessionStoreCompleted(DownloadTask: downloadTask, toURL: location, withDictionary:dictionary)
+            d.sessionStoreCompleted(self.currentRequest, withData: data)
+            self.currentRequest = .None
         }
+        delegate = nil
     }
 }

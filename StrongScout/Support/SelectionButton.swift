@@ -8,6 +8,7 @@
 
 import UIKit
 
+@IBDesignable
 class SelectionButton: UIButton {
 
     /*
@@ -17,7 +18,7 @@ class SelectionButton: UIButton {
         // Drawing code
     }
     */
-    private var selectedColor = UIColor.orangeColor()
+    @IBInspectable var selectedColor = UIColor.orangeColor()
     
     override var selected : Bool {
         didSet {
