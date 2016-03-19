@@ -57,7 +57,7 @@ class EventSelectionViewController: UIViewController {
     @IBAction func getSchedule(sender:UIButton) {
         ScheduleStore.sharedStore.currentSchedule = EventStore.sharedStore.selectedEvent?.code
         let hud = MBProgressHUD.showHUDAddedTo(self.navigationController?.view, animated: true)
-        hud.mode = .Determinate
+        hud.mode = .Indeterminate
         hud.labelText = "Loading..."
         hud.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "cancelRequest:"))
         self.navigationItem.leftBarButtonItem?.enabled = false

@@ -22,7 +22,7 @@ class ScheduleStore: NSObject {
     var currentSchedule:String? {
         didSet {
             if currentSchedule == nil {
-                NSUserDefaults.standardUserDefaults().setNilValueForKey("StrongScout.currentSchedule")
+                NSUserDefaults.standardUserDefaults().setObject(nil, forKey: "StrongScout.currentSchedule")
             } else {
                 NSUserDefaults.standardUserDefaults().setObject(currentSchedule, forKey: "StrongScout.currentSchedule")
             }
@@ -102,6 +102,7 @@ extension ScheduleStore: SessionStoreDelegate {
     
     func sessionStoreCompleted(request: RequestType, withData data: NSData?, andError error: NSError?) {
         if request == .ScheduleList {
+            if error != nil { currentSchedule = nil }
             requestCompletion?(error)
             importSchedule(data)
         }
@@ -112,6 +113,7 @@ extension ScheduleStore: SessionStoreDelegate {
     
     func sessionStoreCanceled(request: RequestType) {
         if request == .ScheduleList {
+            currentSchedule = nil
             requestCanceled?()
         }
         requestCompletion = nil

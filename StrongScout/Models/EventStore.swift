@@ -38,8 +38,12 @@ class EventStore: NSObject {
     private override init() {
         super.init()
         
-        let eventsArchive = NSKeyedUnarchiver.unarchiveObjectWithFile(self.eventArchivePath()) as? [Event]
-        allEvents = eventsArchive ?? allEvents
+        //let eventsArchive = NSKeyedUnarchiver.unarchiveObjectWithFile(self.eventArchivePath()) as? [Event]
+        let eventDataAsset = NSDataAsset(name: "Events")
+        if let eda = eventDataAsset {
+            let eventsArchive = NSKeyedUnarchiver.unarchiveObjectWithData(eda.data) as? [Event]
+            allEvents = eventsArchive ?? allEvents
+        }
         let data = NSUserDefaults.standardUserDefaults().valueForKey("StrongScout.selectedEvent") as? NSData
         if data != nil {
             self.selectedEvent = NSKeyedUnarchiver.unarchiveObjectWithData(data!) as? Event

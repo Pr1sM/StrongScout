@@ -63,6 +63,11 @@ class MatchStore: NSObject {
         return (documentFolder as NSString).stringByAppendingPathComponent("MatchQueue.archive")
     }
     
+    func filePath(filename:String) -> String {
+        let documentFolder = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
+        return (documentFolder as NSString).stringByAppendingPathComponent(filename)
+    }
+    
     func csvFilePath() -> String {
         let documentFolder = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)[0]
         return (documentFolder as NSString).stringByAppendingPathComponent("Match data - \(UIDevice.currentDevice().name).csv")
@@ -77,12 +82,23 @@ class MatchStore: NSObject {
         
         let path = self.matchArchivePath()
         let path2 = self.match2ScoutArchivePath()
+        let jsonPath = self.filePath("Match.json")
         
         var queueData = [NSDictionary]()
         for mqd in matchesToScout {
             let d = mqd.propertyListRepresentation()
             queueData.append(d)
         }
+        
+        let data = dataTransferMatchesAll(true)
+        let string = String(data: data!, encoding: NSUTF8StringEncoding)
+        
+        do {
+            try string?.writeToFile(jsonPath, atomically: true, encoding: NSUTF8StringEncoding)
+        } catch  {
+            
+        }
+        
         NSKeyedArchiver.archiveRootObject(queueData, toFile: path2)
         
         return NSKeyedArchiver.archiveRootObject(allMatches, toFile: path)
