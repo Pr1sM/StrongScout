@@ -30,8 +30,9 @@ class EventStore: NSObject {
         }
     }
     
-    var requestProgressUpdate:Optional<(Double) -> ()> = nil
-    var requestCompletion:Optional<(Bool) -> ()> = nil
+    var requestProgressUpdate:((Double) -> ())? = nil
+    var requestCompletion:((NSError?) -> ())? = nil
+    var requestCanceled:(() -> ())? = nil
     
     
     private override init() {
@@ -57,10 +58,15 @@ class EventStore: NSObject {
         return (documentFolder as NSString).stringByAppendingPathComponent("Events.archive")
     }
     
-    func getEventsList(inProgress:Optional<(Double) -> ()>, completion:Optional<(Bool) -> ()>) {
+    func getEventsList(inProgress:((Double) -> ())?, completion:((NSError?) -> ())?) {
         requestProgressUpdate = inProgress
         requestCompletion = completion
         SessionStore.sharedStore.runRequest(.EventList, withDelegate: self)
+    }
+    
+    func cancelRequest(handler:(() -> ())?) {
+        requestCanceled = handler
+        SessionStore.sharedStore.cancelRequest()
     }
     
     func importEventsList(data:NSData?) {
@@ -150,14 +156,27 @@ class EventStore: NSObject {
 }
 
 extension EventStore: SessionStoreDelegate {
-    func sessionStore(progress: Double, forDownloadTask task: NSURLSessionDownloadTask) {
-        requestProgressUpdate?(progress)
+    func sessionStore(progress: Double, forRequest request: RequestType) {
+        if request == .EventList {
+            requestProgressUpdate?(progress)
+        }
     }
     
-    func sessionStoreCompleted(request: RequestType, withData data: NSData?) {
-        requestCompletion?(true)
+    func sessionStoreCompleted(request: RequestType, withData data: NSData?, andError error: NSError?) {
         if request == .EventList {
-            importEventsList(data)
+            requestCompletion?(error)
         }
+        requestCanceled = nil
+        requestCompletion = nil
+        requestProgressUpdate = nil
+    }
+    
+    func sessionStoreCanceled(request: RequestType) {
+        if request == .EventList {
+            requestCanceled?()
+        }
+        requestCanceled = nil
+        requestCompletion = nil
+        requestProgressUpdate = nil
     }
 }

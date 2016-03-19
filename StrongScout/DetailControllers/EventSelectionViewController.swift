@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MBProgressHUD
 
 class EventSelectionViewController: UIViewController {
     @IBOutlet weak var tableView:UITableView!
@@ -32,6 +33,7 @@ class EventSelectionViewController: UIViewController {
         selectedList = 0
         for b in listSelectorButtons {
             b.selected = false
+            b.enabled = ScheduleStore.sharedStore.currentSchedule != nil
         }
     }
     
@@ -54,11 +56,52 @@ class EventSelectionViewController: UIViewController {
     
     @IBAction func getSchedule(sender:UIButton) {
         ScheduleStore.sharedStore.currentSchedule = EventStore.sharedStore.selectedEvent?.code
-        ScheduleStore.sharedStore.getScheduleList(nil, completion: nil)
+        let hud = MBProgressHUD.showHUDAddedTo(self.navigationController?.view, animated: true)
+        hud.mode = .Determinate
+        hud.labelText = "Loading..."
+        hud.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "cancelRequest:"))
+        self.navigationItem.leftBarButtonItem?.enabled = false
+        self.getScheduleButton.enabled = false
+        self.buildListButton.enabled = false
+        ScheduleStore.sharedStore.getScheduleList({ (progress:Double) in
+            dispatch_async(dispatch_get_main_queue(), {
+                let hud = MBProgressHUD(forView: self.navigationController?.view)
+                hud.mode = .Determinate
+                hud.progress = Float(progress)
+            })
+        }, completion: { (error) in
+            dispatch_async(dispatch_get_main_queue(), {
+                let hud = MBProgressHUD(forView: self.navigationController?.view)
+                let imageView = UIImageView(image: UIImage(named: error == nil ? "check" : "close"))
+                self.navigationItem.leftBarButtonItem?.enabled = true
+                self.getScheduleButton.enabled = true
+                self.buildListButton.enabled = self.selectedList > 0
+                hud.customView = imageView
+                hud.mode = .CustomView
+                hud.labelText = error == nil ? "Completed" : "Error"
+                hud.hide(true, afterDelay: 1)
+            })
+        })
     }
     
     @IBAction func buildList(sender:UIButton) {
-        
+        print("build list - IMPLEMENT")
+    }
+    
+    func cancelRequest(sender:UITapGestureRecognizer) {
+        ScheduleStore.sharedStore.cancelRequest({
+            dispatch_async(dispatch_get_main_queue(), {
+                let hud = MBProgressHUD(forView: self.navigationController?.view)
+                let imageView = UIImageView(image: UIImage(named: "close"))
+                self.navigationItem.leftBarButtonItem?.enabled = true
+                self.getScheduleButton.enabled = true
+                self.buildListButton.enabled = self.selectedList > 0
+                hud.customView = imageView
+                hud.mode = .CustomView
+                hud.labelText = "Canceled"
+                hud.hide(true, afterDelay: 1)
+            })
+        })
     }
 }
 
@@ -109,6 +152,7 @@ extension EventSelectionViewController: UITableViewDelegate {
         if indexPath.section == 0 { return }
         let event = EventStore.sharedStore.eventsByType[indexPath.section-1][indexPath.row]
         EventStore.sharedStore.selectedEvent = event
+        getScheduleButton.enabled = true
         tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: .Right)
         tableView.selectRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), animated: true, scrollPosition: .Top)
     }

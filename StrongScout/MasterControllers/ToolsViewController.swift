@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreBluetooth
+import MBProgressHUD
 
 class ToolsViewController: UIViewController {
     
@@ -83,10 +84,41 @@ class ToolsViewController: UIViewController {
     }
     
     @IBAction func getEventList(sender:UIButton) {
+        let hud = MBProgressHUD.showHUDAddedTo(self.navigationController?.view, animated: true)
+        hud.labelText = "Loading..."
+        hud.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "cancelRequest:"))
+        self.navigationItem.leftBarButtonItem?.enabled = false
         EventStore.sharedStore.getEventsList({(progress) in
-            print("progress: \(progress)")
-            }, completion: {(complete) in
-            print("download completed")
+            dispatch_async(dispatch_get_main_queue(), {
+                let hud = MBProgressHUD(forView: self.navigationController?.view)
+                hud.mode = .Determinate
+                hud.progress = Float(progress)
+            })
+        }, completion: {(error) in
+            dispatch_async(dispatch_get_main_queue(), {
+                let hud = MBProgressHUD(forView: self.navigationController?.view)
+                let image = UIImage(named: error == nil ? "check" : "close")
+                let imageView = UIImageView(image: image)
+                self.navigationItem.leftBarButtonItem?.enabled = true
+                hud.customView = imageView
+                hud.mode = .CustomView
+                hud.labelText = error == nil ? "Completed" : "Error"
+                hud.hide(true, afterDelay: 1)
+            })
+        })
+    }
+    
+    func cancelRequest(sender:UITapGestureRecognizer) {
+        EventStore.sharedStore.cancelRequest({
+            dispatch_async(dispatch_get_main_queue(), {
+                let hud = MBProgressHUD(forView: self.navigationController?.view)
+                let imageView = UIImageView(image: UIImage(named: "close"))
+                self.navigationItem.leftBarButtonItem?.enabled = true
+                hud.customView = imageView
+                hud.mode = .CustomView
+                hud.labelText = "Canceled"
+                hud.hide(true, afterDelay: 1)
+            })
         })
     }
     

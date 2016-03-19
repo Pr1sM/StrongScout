@@ -25,8 +25,9 @@ enum RequestType: Int {
 }
 
 protocol SessionStoreDelegate: class {
-    func sessionStoreCompleted(request:RequestType, withData data:NSData?)
-    func sessionStore(progress:Double, forDownloadTask task:NSURLSessionDownloadTask)
+    func sessionStoreCompleted(request:RequestType, withData data:NSData?, andError error:NSError?)
+    func sessionStoreCanceled(request:RequestType)
+    func sessionStore(progress:Double, forRequest request:RequestType)
 }
 
 class SessionStore: NSObject {
@@ -36,6 +37,7 @@ class SessionStore: NSObject {
     
     private var sessionConfig:NSURLSessionConfiguration!
     private var currentRequest:RequestType = .None
+    private var currentTask:NSURLSessionDownloadTask? = nil
     
     private override init() {
         super.init()
@@ -58,13 +60,31 @@ class SessionStore: NSObject {
 //    }
     
     func runRequest(type:RequestType, withDelegate delegate:SessionStoreDelegate?) {
+        guard currentTask == nil else { return }
         self.delegate = delegate
         self.currentRequest = type
         let url = NSURL(string: self.currentRequest.url)!
         let session = NSURLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
         let request = NSMutableURLRequest(URL: url)
-        let task = session.downloadTaskWithRequest(request)
-        task.resume()
+        currentTask = session.downloadTaskWithRequest(request)
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(5000 * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), {
+//            self.currentTask!.resume()
+//        })
+        currentTask!.resume()
+    }
+    
+    func cancelRequest() {
+        guard currentTask != nil else { return }
+        currentTask!.cancel()
+    }
+    
+    private func sessionCompleteCleanup(data:NSData?, error:NSError?) {
+        if let d = delegate {
+            d.sessionStoreCompleted(self.currentRequest, withData: data, andError: error)
+        }
+        delegate = nil
+        self.currentRequest = .None
+        self.currentTask = nil
     }
 }
 
@@ -73,12 +93,30 @@ extension SessionStore: NSURLSessionDelegate {
         if let error = error {
             print("\(session) did become invalid with error: \(error)")
         }
+        if let d = delegate {
+            d.sessionStoreCanceled(self.currentRequest)
+        }
+        delegate = nil
+        self.currentRequest = .None
+        self.currentTask = nil
     }
 }
 
 extension SessionStore: NSURLSessionTaskDelegate {
     func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
         print("\(session), \(task) did complete with error \(error)")
+        if error == nil {
+            self.sessionCompleteCleanup(nil, error: nil)
+        } else if error!.userInfo[NSLocalizedDescriptionKey] as! String == "cancelled" {
+            if let d = delegate {
+                d.sessionStoreCanceled(self.currentRequest)
+            }
+            delegate = nil
+            self.currentRequest = .None
+            self.currentTask = nil
+        } else {
+            self.sessionCompleteCleanup(nil, error: error)
+        }
     }
 }
 
@@ -86,16 +124,12 @@ extension SessionStore: NSURLSessionDownloadDelegate {
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
         if let d = delegate {
-            d.sessionStore(progress, forDownloadTask: downloadTask)
+            d.sessionStore(progress, forRequest: self.currentRequest)
         }
     }
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
-        if let d = delegate {
-            let data = NSData(contentsOfURL: location)
-            d.sessionStoreCompleted(self.currentRequest, withData: data)
-            self.currentRequest = .None
-        }
-        delegate = nil
+        let data = NSData(contentsOfURL: location)
+        self.sessionCompleteCleanup(data, error: nil)
     }
 }

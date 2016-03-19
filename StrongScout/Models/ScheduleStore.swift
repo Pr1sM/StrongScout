@@ -13,8 +13,9 @@ class ScheduleStore: NSObject {
     
     static let sharedStore:ScheduleStore = ScheduleStore()
     
-    var requestProgressUpdate:Optional<(Double) -> ()> = nil
-    var requestCompletion:Optional<(Bool) -> ()> = nil
+    var requestProgressUpdate:((Double) -> ())? = nil
+    var requestCompletion:((NSError?) -> ())? = nil
+    var requestCanceled:(() -> ())? = nil
     
     var schedule:[ScheduleItem] = []
     
@@ -47,11 +48,16 @@ class ScheduleStore: NSObject {
         return NSKeyedArchiver.archiveRootObject(schedule, toFile: path)
     }
     
-    func getScheduleList(inProgress:Optional<(Double) -> ()>, completion:Optional<(Bool) -> ()>) {
+    func getScheduleList(inProgress:((Double) -> ())?, completion:((NSError?) -> ())?) {
         guard currentSchedule != nil else { return }
         requestProgressUpdate = inProgress
         requestCompletion = completion
         SessionStore.sharedStore.runRequest(.ScheduleList, withDelegate: self)
+    }
+    
+    func cancelRequest(handler:(() -> ())?) {
+        requestCanceled = handler
+        SessionStore.sharedStore.cancelRequest()
     }
     
     func importSchedule(data:NSData?) {
@@ -71,14 +77,28 @@ class ScheduleStore: NSObject {
 }
 
 extension ScheduleStore: SessionStoreDelegate {
-    func sessionStore(progress: Double, forDownloadTask task: NSURLSessionDownloadTask) {
-        requestProgressUpdate?(progress)
+    func sessionStore(progress: Double, forRequest request: RequestType) {
+        if request == .ScheduleList {
+            requestProgressUpdate?(progress)
+        }
     }
     
-    func sessionStoreCompleted(request: RequestType, withData data: NSData?) {
-        requestCompletion?(true)
+    func sessionStoreCompleted(request: RequestType, withData data: NSData?, andError error: NSError?) {
         if request == .ScheduleList {
+            requestCompletion?(error)
             importSchedule(data)
         }
+        requestCompletion = nil
+        requestProgressUpdate = nil
+        requestCanceled = nil
+    }
+    
+    func sessionStoreCanceled(request: RequestType) {
+        if request == .ScheduleList {
+            requestCanceled?()
+        }
+        requestCompletion = nil
+        requestProgressUpdate = nil
+        requestCanceled = nil
     }
 }
