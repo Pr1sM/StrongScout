@@ -113,16 +113,17 @@ class MatchStore: NSObject {
 //        }
 //    }
     
-    // MARK: TODO - FIX CSV FILE SAVING
     func writeCSVFile() -> Bool {
         let device = "\(UIDevice.currentDevice().name)    \r\n"
         var csvFileString = device
         
+        csvFileString += Match.writeMatchCSVHeader()
+        
         for m in allMatches {
             if let m:Match = m {
-                if m.isCompleted == 31 {
-                    csvFileString += "WriteMatchGoesHere\r\n"
-                }
+                //if m.isCompleted == 31 {
+                csvFileString += m.writeMatchCSV() + " \r\n"
+                //}
             }
         }
         

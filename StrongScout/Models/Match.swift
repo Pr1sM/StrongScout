@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftyJSON
 
 class Match : NSObject, NSCoding {
     
@@ -365,5 +366,132 @@ class Match : NSObject, NSCoding {
         data["final"]   = final
         
         return data;
+    }
+    
+    static func writeMatchCSVHeader() -> String {
+        var matchHeader = ""
+        
+        matchHeader += "Match Number, Team Number, Alliance, "
+        
+        matchHeader += "Auto Scored High, Auto Scored Low, Auto Missed High, Auto Missed Low, "
+        matchHeader += "Auto Scored Batters, Auto Scored Courtyard, Auto Scored Defenses, "
+        
+        matchHeader += "Tele Scored High, Tele Scored Low, Tele Missed High, Tele Missed Low, "
+        matchHeader += "Tele Scored Batters, Tele Scored Courtyard, Tele Scored Defenses, "
+        
+        matchHeader += "Defense 1 Type, "
+        matchHeader += "D1 Auto Crossed, D1 Auto Attempted Cross, D1 Auto Crossed With Ball, D1 Auto Assisted Cross, "
+        matchHeader += "D1 Tele Crossed, D1 Tele Attempted Cross, D1 Tele Crossed With Ball, D1 Tele Assisted Cross, "
+        
+        matchHeader += "Defense 2 Type, "
+        matchHeader += "D2 Auto Crossed, D2 Auto Attempted Cross, D2 Auto Crossed With Ball, D2 Auto Assisted Cross, "
+        matchHeader += "D2 Tele Crossed, D2 Tele Attempted Cross, D2 Tele Crossed With Ball, D2 Tele Assisted Cross, "
+        
+        matchHeader += "Defense 3 Type, "
+        matchHeader += "D3 Auto Crossed, D3 Auto Attempted Cross, D3 Auto Crossed With Ball, D3 Auto Assisted Cross, "
+        matchHeader += "D3 Tele Crossed, D3 Tele Attempted Cross, D3 Tele Crossed With Ball, D3 Tele Assisted Cross, "
+        
+        matchHeader += "Defense 4 Type, "
+        matchHeader += "D4 Auto Crossed, D4 Auto Attempted Cross, D4 Auto Crossed With Ball, D4 Auto Assisted Cross, "
+        matchHeader += "D4 Tele Crossed, D4 Tele Attempted Cross, D4 Tele Crossed With Ball, D4 Tele Assisted Cross, "
+        
+        matchHeader += "Defense 5 Type, "
+        matchHeader += "D5 Auto Crossed, D5 Auto Attempted Cross, D5 Auto Crossed With Ball, D5 Auto Assisted Cross, "
+        matchHeader += "D5 Tele Crossed, D5 Tele Attempted Cross, D5 Tele Crossed With Ball, D5 Tele Assisted Cross, "
+        
+        matchHeader += "Final Score, Final Ranking Points, Final Penalty Score, Final Result, Fouls, Tech Fouls, Yellow Cards, Red Cards, Robot, Config, Comments \r\n"
+        
+        return matchHeader
+    }
+    
+    func writeMatchCSV() -> String {
+        var matchData = ""
+        let match = JSON(messageDictionary())
+        
+        // This will be done in a loop...eventually
+        
+        matchData += "\(match["team", "matchNumber"].intValue), "
+        matchData += "\(match["team", "teamNumber"].intValue), "
+        matchData += "\(match["team", "alliance"].stringValue), "
+        
+        matchData += "\(match["auto", "scoreHigh"].intValue), "
+        matchData += "\(match["auto", "scoreLow"].intValue), "
+        matchData += "\(match["auto", "missedHigh"].intValue), "
+        matchData += "\(match["auto", "missedLow"].intValue), "
+        matchData += "\(match["auto", "scoredBatters"].intValue), "
+        matchData += "\(match["auto", "scoredCourtyard"].intValue), "
+        matchData += "\(match["auto", "scoredDefenses"].intValue), "
+        
+        matchData += "\(match["score", "scoreHigh"].intValue), "
+        matchData += "\(match["score", "scoreLow"].intValue), "
+        matchData += "\(match["score", "missedHigh"].intValue), "
+        matchData += "\(match["score", "missedLow"].intValue), "
+        matchData += "\(match["score", "scoredBatters"].intValue), "
+        matchData += "\(match["score", "scoredCourtyard"].intValue), "
+        matchData += "\(match["score", "scoredDefenses"].intValue), "
+        
+        matchData += "\(match["defense", "defense1", "type"].intValue), "
+        matchData += "\(match["defense", "defense1", "atcross"].intValue), "
+        matchData += "\(match["defense", "defense1", "afcross"].intValue), "
+        matchData += "\(match["defense", "defense1", "abcross"].intValue), "
+        matchData += "\(match["defense", "defense1", "aacross"].intValue), "
+        matchData += "\(match["defense", "defense1", "cross"].intValue), "
+        matchData += "\(match["defense", "defense1", "fcross"].intValue), "
+        matchData += "\(match["defense", "defense1", "bcross"].intValue), "
+        matchData += "\(match["defense", "defense1", "across"].intValue), "
+        
+        matchData += "\(match["defense", "defense2", "type"].intValue), "
+        matchData += "\(match["defense", "defense2", "atcross"].intValue), "
+        matchData += "\(match["defense", "defense2", "afcross"].intValue), "
+        matchData += "\(match["defense", "defense2", "abcross"].intValue), "
+        matchData += "\(match["defense", "defense2", "aacross"].intValue), "
+        matchData += "\(match["defense", "defense2", "cross"].intValue), "
+        matchData += "\(match["defense", "defense2", "fcross"].intValue), "
+        matchData += "\(match["defense", "defense2", "bcross"].intValue), "
+        matchData += "\(match["defense", "defense2", "across"].intValue), "
+        
+        matchData += "\(match["defense", "defense3", "type"].intValue), "
+        matchData += "\(match["defense", "defense3", "atcross"].intValue), "
+        matchData += "\(match["defense", "defense3", "afcross"].intValue), "
+        matchData += "\(match["defense", "defense3", "abcross"].intValue), "
+        matchData += "\(match["defense", "defense3", "aacross"].intValue), "
+        matchData += "\(match["defense", "defense3", "cross"].intValue), "
+        matchData += "\(match["defense", "defense3", "fcross"].intValue), "
+        matchData += "\(match["defense", "defense3", "bcross"].intValue), "
+        matchData += "\(match["defense", "defense3", "across"].intValue), "
+        
+        matchData += "\(match["defense", "defense4", "type"].intValue), "
+        matchData += "\(match["defense", "defense4", "atcross"].intValue), "
+        matchData += "\(match["defense", "defense4", "afcross"].intValue), "
+        matchData += "\(match["defense", "defense4", "abcross"].intValue), "
+        matchData += "\(match["defense", "defense4", "aacross"].intValue), "
+        matchData += "\(match["defense", "defense4", "cross"].intValue), "
+        matchData += "\(match["defense", "defense4", "fcross"].intValue), "
+        matchData += "\(match["defense", "defense4", "bcross"].intValue), "
+        matchData += "\(match["defense", "defense4", "across"].intValue), "
+        
+        matchData += "\(match["defense", "defense5", "type"].intValue), "
+        matchData += "\(match["defense", "defense5", "atcross"].intValue), "
+        matchData += "\(match["defense", "defense5", "afcross"].intValue), "
+        matchData += "\(match["defense", "defense5", "abcross"].intValue), "
+        matchData += "\(match["defense", "defense5", "aacross"].intValue), "
+        matchData += "\(match["defense", "defense5", "cross"].intValue), "
+        matchData += "\(match["defense", "defense5", "fcross"].intValue), "
+        matchData += "\(match["defense", "defense5", "bcross"].intValue), "
+        matchData += "\(match["defense", "defense5", "across"].intValue), "
+        
+        matchData += "\(match["final", "score"].intValue), "
+        matchData += "\(match["final", "rPoints"].intValue), "
+        matchData += "\(match["final", "pScore"].intValue), "
+        matchData += "\(match["final", "result"].intValue), "
+        matchData += "\(match["final", "fouls"].intValue), "
+        matchData += "\(match["final", "tFouls"].intValue), "
+        matchData += "\(match["final", "yCards"].intValue), "
+        matchData += "\(match["final", "rCards"].intValue), "
+        matchData += "\(match["final", "robot"].intValue), "
+        matchData += "\(match["final", "config"].intValue), "
+        matchData += "\(match["final", "comments"].stringValue) "
+
+        return matchData
     }
 }

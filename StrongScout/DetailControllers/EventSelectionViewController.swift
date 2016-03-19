@@ -88,10 +88,32 @@ class EventSelectionViewController: UIViewController {
     }
     
     @IBAction func buildList(sender:UIButton) {
+        if ScheduleStore.sharedStore.currentSchedule != EventStore.sharedStore.selectedEvent?.code {
+            let scheduleAC = UIAlertController(title: "Current Schedule is different from Selected Event", message: "You have a schedule from a different event! Would you like to continue with the build, or get the new schedule", preferredStyle: .Alert)
+            let buildAction = UIAlertAction(title: "Continue With Build", style: .Default, handler: { (action) in
+                self.confirmBuildList()
+            })
+            scheduleAC.addAction(buildAction)
+            
+            let getScheduleAction = UIAlertAction(title: "Get New Schedule", style: .Default, handler: { (action) in
+                self.getSchedule(self.getScheduleButton)
+            })
+            scheduleAC.addAction(getScheduleAction)
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+            scheduleAC.addAction(cancelAction)
+            
+            self.presentViewController(scheduleAC, animated: true, completion: nil)
+        } else {
+            confirmBuildList()
+        }
+    }
+    
+    func confirmBuildList() {
         var list = (selectedList & 4) == 1 ? "Blue" : "Red"
         list += " \(selectedList & 3)"
         let ac = UIAlertController(title: "Build \(list) List for event \(ScheduleStore.sharedStore.currentSchedule!)", message: "Building this list will clear the previous queue of matches.  Do you want to continue?", preferredStyle: .Alert)
-        let continueAction = UIAlertAction(title: "Continue", style: .Default, handler: {(action) in
+        let continueAction = UIAlertAction(title: "Continue", style: .Destructive, handler: {(action) in
             let hud = MBProgressHUD.showHUDAddedTo(self.navigationController?.view, animated: true)
             hud.mode = .Indeterminate
             hud.labelText = "Building List"
@@ -184,7 +206,7 @@ extension EventSelectionViewController: UITableViewDelegate {
         
         getScheduleButton.enabled = true
         tableView.beginUpdates()
-        if EventStore.sharedStore.selectedEvent != nil { // selected event is there, we need to remove it first
+        if EventStore.sharedStore.selectedEvent != nil { // selected event is there, we need to remove the cell
             tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: .Right)
         }
         EventStore.sharedStore.selectedEvent = event

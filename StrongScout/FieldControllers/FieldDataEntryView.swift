@@ -79,7 +79,7 @@ class FieldDataEntryView: UIViewController {
         rightStack.alignment = .Fill
         rightStack.spacing = 20
         
-        sectionSelection = UISegmentedControl(items: ["Autonomous", "Telelop"])
+        sectionSelection = UISegmentedControl(items: ["Autonomous", "Teleop"])
         sectionSelection.selectedSegmentIndex = 0
         sectionSelection.tintColor = UIColor(red: 1.0, green: 0.40, blue: 0, alpha: 1.0)
         sectionSelection.setContentHuggingPriority(750, forAxis: .Vertical)
