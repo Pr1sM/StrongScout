@@ -28,36 +28,43 @@ class ScheduleViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+        return ScheduleStore.sharedStore.schedule.count
     }
     
     @IBAction func unwindToSchedule(sender:UIStoryboardSegue) {
-        
+        self.tableView.reloadData()
     }
 
-    /*
+    
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath)
-
-        // Configure the cell...
-
+        let cell = tableView.dequeueReusableCellWithIdentifier("ScheduleCell", forIndexPath: indexPath) as! ScheduleCell
+        let scheduleItem = ScheduleStore.sharedStore.schedule[indexPath.row]
+        
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = "M'/'d h:mm a"
+        cell.title.text = scheduleItem.desc
+        cell.teamBlue1.text = "\(scheduleItem.teams[0].teamNumber)"
+        cell.teamBlue2.text = "\(scheduleItem.teams[1].teamNumber)"
+        cell.teamBlue3.text = "\(scheduleItem.teams[2].teamNumber)"
+        cell.teamRed1.text = "\(scheduleItem.teams[3].teamNumber)"
+        cell.teamRed2.text = "\(scheduleItem.teams[4].teamNumber)"
+        cell.teamRed3.text = "\(scheduleItem.teams[5].teamNumber)"
+        cell.time.text = formatter.stringFromDate(scheduleItem.startTime!)
         return cell
     }
-    */
+    
 
-    /*
+    
     // Override to support conditional editing of the table view.
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
-        return true
+        return false
     }
-    */
+    
 
     /*
     // Override to support editing the table view.
@@ -78,13 +85,13 @@ class ScheduleViewController: UITableViewController {
     }
     */
 
-    /*
+
     // Override to support conditional rearranging of the table view.
     override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return false if you do not want the item to be re-orderable.
-        return true
+        return false
     }
-    */
+    
 
     /*
     // MARK: - Navigation

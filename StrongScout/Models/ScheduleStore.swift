@@ -33,12 +33,18 @@ class ScheduleStore: NSObject {
         
         currentSchedule = NSUserDefaults.standardUserDefaults().objectForKey("StrongScout.currentSchedule") as? String
         
-        schedule = NSKeyedUnarchiver.unarchiveObjectWithFile(scheduleArchivePath()) as? [ScheduleItem] ?? schedule
+        let path = self.scheduleArchivePath()
+        schedule = NSKeyedUnarchiver.unarchiveObjectWithFile(path) as? [ScheduleItem] ?? schedule
     }
     
     func scheduleArchivePath() -> String {
         let documentFolder = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
         return (documentFolder as NSString).stringByAppendingPathComponent("Schedule.archive")
+    }
+    
+    func saveSchedule() -> Bool {
+        let path = self.scheduleArchivePath()
+        return NSKeyedArchiver.archiveRootObject(schedule, toFile: path)
     }
     
     func getScheduleList(inProgress:Optional<(Double) -> ()>, completion:Optional<(Bool) -> ()>) {
@@ -58,7 +64,9 @@ class ScheduleStore: NSObject {
             let scheduleItem = ScheduleItem(json: subJSON)
             schedule.append(scheduleItem)
         }
+        schedule.sortInPlace({ $0.startTime!.compare($1.startTime!) == .OrderedAscending })
         print("Imported \(schedule.count) Schedule Items")
+        self.saveSchedule()
     }
 }
 

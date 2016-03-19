@@ -61,6 +61,8 @@ class ScheduleItem: NSObject, NSCoding {
             let team = Team(json: subJSON)
             teams.append(team)
         }
+        
+        teams.sortInPlace({$0.station.compare($1.station) == .OrderedAscending})
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -77,6 +79,7 @@ class ScheduleItem: NSObject, NSCoding {
             guard let team = Team(propertyListRepresentation: pList) else { continue }
             self.teams.append(team)
         }
+        teams.sortInPlace({$0.station.compare($1.station) == .OrderedAscending})
     }
     
     func encodeWithCoder(aCoder: NSCoder) {
