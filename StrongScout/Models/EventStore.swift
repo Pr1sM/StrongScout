@@ -165,6 +165,9 @@ extension EventStore: SessionStoreDelegate {
     func sessionStoreCompleted(request: RequestType, withData data: NSData?, andError error: NSError?) {
         if request == .EventList {
             requestCompletion?(error)
+            if let d = data {
+                importEventsList(d)
+            }
         }
         requestCanceled = nil
         requestCompletion = nil

@@ -300,6 +300,12 @@ class Match : NSObject, NSCoding {
         // init
     }
     
+    init(queueData:MatchQueueData) {
+        self.matchNumber = queueData.matchNumber
+        self.teamNumber  = queueData.teamNumber
+        self.alliance    = queueData.alliance
+    }
+    
     func messageDictionary() -> NSDictionary {
         var data:[String:AnyObject]    = [String:AnyObject]()
         var team:[String:AnyObject]    = [String:AnyObject]()

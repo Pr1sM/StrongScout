@@ -30,6 +30,10 @@ class ScheduleViewController: UITableViewController {
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
+    
+    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return ScheduleStore.sharedStore.currentSchedule
+    }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return ScheduleStore.sharedStore.schedule.count

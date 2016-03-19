@@ -75,6 +75,9 @@ class EventSelectionViewController: UIViewController {
                 let imageView = UIImageView(image: UIImage(named: error == nil ? "check" : "close"))
                 self.navigationItem.leftBarButtonItem?.enabled = true
                 self.getScheduleButton.enabled = true
+                for b in self.listSelectorButtons {
+                    b.enabled = ScheduleStore.sharedStore.currentSchedule != nil
+                }
                 self.buildListButton.enabled = self.selectedList > 0
                 hud.customView = imageView
                 hud.mode = .CustomView
@@ -85,7 +88,31 @@ class EventSelectionViewController: UIViewController {
     }
     
     @IBAction func buildList(sender:UIButton) {
-        print("build list - IMPLEMENT")
+        var list = (selectedList & 4) == 1 ? "Blue" : "Red"
+        list += " \(selectedList & 3)"
+        let ac = UIAlertController(title: "Build \(list) List for event \(ScheduleStore.sharedStore.currentSchedule!)", message: "Building this list will clear the previous queue of matches.  Do you want to continue?", preferredStyle: .Alert)
+        let continueAction = UIAlertAction(title: "Continue", style: .Default, handler: {(action) in
+            let hud = MBProgressHUD.showHUDAddedTo(self.navigationController?.view, animated: true)
+            hud.mode = .Indeterminate
+            hud.labelText = "Building List"
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), {
+                ScheduleStore.sharedStore.buildMatchListForGroup(self.selectedList)
+                dispatch_async(dispatch_get_main_queue(), {
+                    let hud = MBProgressHUD(forView: self.navigationController?.view)
+                    let imageView = UIImageView(image: UIImage(named: "check"))
+                    hud.customView = imageView
+                    hud.mode = .CustomView
+                    hud.labelText = "Completed"
+                    hud.hide(true, afterDelay: 1)
+                })
+            })
+        })
+        ac.addAction(continueAction)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+        ac.addAction(cancelAction)
+        
+        self.presentViewController(ac, animated: true, completion: nil)
     }
     
     func cancelRequest(sender:UITapGestureRecognizer) {
@@ -95,6 +122,9 @@ class EventSelectionViewController: UIViewController {
                 let imageView = UIImageView(image: UIImage(named: "close"))
                 self.navigationItem.leftBarButtonItem?.enabled = true
                 self.getScheduleButton.enabled = true
+                for b in self.listSelectorButtons {
+                    b.enabled = ScheduleStore.sharedStore.currentSchedule != nil
+                }
                 self.buildListButton.enabled = self.selectedList > 0
                 hud.customView = imageView
                 hud.mode = .CustomView
@@ -151,9 +181,16 @@ extension EventSelectionViewController: UITableViewDelegate {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == 0 { return }
         let event = EventStore.sharedStore.eventsByType[indexPath.section-1][indexPath.row]
-        EventStore.sharedStore.selectedEvent = event
+        
         getScheduleButton.enabled = true
-        tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: .Right)
+        tableView.beginUpdates()
+        if EventStore.sharedStore.selectedEvent != nil { // selected event is there, we need to remove it first
+            tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: .Right)
+        }
+        EventStore.sharedStore.selectedEvent = event
+        tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: .Left)
+        tableView.endUpdates()
+        
         tableView.selectRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), animated: true, scrollPosition: .Top)
     }
 }

@@ -46,11 +46,8 @@ class MasterViewController: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showMatchSummary" {
             if let indexPath = self.tableView.indexPathForSelectedRow {
-                let match = MatchStore.sharedStore.allMatches![indexPath.row]
+                let match = MatchStore.sharedStore.allMatches[indexPath.row]
                 match.aggregateActionsPerformed()
-                //let nav = segue.destinationViewController as! UINavigationController
-//                let controller = (segue.destinationViewController as! UINavigationController).topViewController as! MatchSummaryViewController
-//                controller.match = match
                 let storyboard = UIStoryboard(name: "Results", bundle: nil)
                 let sr = storyboard.instantiateViewControllerWithIdentifier("ResultsScoringViewController") as! ResultsScoringViewController
                 let tr = storyboard.instantiateViewControllerWithIdentifier("ResultsTeleopViewController") as! ResultsTeleopViewController
@@ -65,31 +62,50 @@ class MasterViewController: UITableViewController {
             }
         } else if segue.identifier == "SegueToNewMatch" {
             MatchStore.sharedStore.createMatch()
+        } else if segue.identifier == "segueToMatchQueue" {
+            if let indexPath = self.tableView.indexPathForSelectedRow {
+                MatchStore.sharedStore.createMatchFromQueueIndex(indexPath.row)
+            }
         }
     }
     
     // MARK: Unwind Segues
     
     @IBAction func unwindToMatchView(sender:UIStoryboardSegue) {
-        
+        self.tableView.reloadData()
     }
 
     // MARK: - Table View
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
+        return 2
+    }
+    
+    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return section == 0 ? MatchStore.sharedStore.matchesToScout.count > 0 ? "Matches Queued for Scouting" : nil :
+                              MatchStore.sharedStore.allMatches.count     > 0 ? "Completed Matches"           : nil
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (MatchStore.sharedStore.allMatches?.count)!
-        
+        return section == 0 ? MatchStore.sharedStore.matchesToScout.count : MatchStore.sharedStore.allMatches.count
+    }
+    
+    override func tableView(tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        return section == 0 ? MatchStore.sharedStore.matchesToScout.count > 0 ? "\(MatchStore.sharedStore.matchesToScout.count) Match(es)" : nil :
+                              MatchStore.sharedStore.allMatches.count     > 0 ? "\(MatchStore.sharedStore.allMatches.count) Match(es)"     : nil
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
 
-        let match = MatchStore.sharedStore.allMatches![indexPath.row]
-        cell.textLabel!.text = "\(match.matchNumber) - \(match.teamNumber)"
+        if indexPath.section == 0 {
+            let match = MatchStore.sharedStore.matchesToScout[indexPath.row]
+            cell.textLabel!.text = "\(match.matchNumber) - \(match.teamNumber)"
+        } else {
+            let match = MatchStore.sharedStore.allMatches[indexPath.row]
+            cell.textLabel!.text = "\(match.matchNumber) - \(match.teamNumber)"
+        }
+
         return cell
     }
 
@@ -99,13 +115,22 @@ class MasterViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let match = MatchStore.sharedStore.allMatches![indexPath.row]
-            MatchStore.sharedStore.removeMatch(match)
+            if indexPath.section == 0 {
+                MatchStore.sharedStore.removeMatchQueueAtIndex(indexPath.row)
+            } else {
+                MatchStore.sharedStore.removeMatchAtIndex(indexPath.row)
+            }
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             MatchStore.sharedStore.saveChanges()
         }
     }
 
-
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if indexPath.section == 0 {
+            performSegueWithIdentifier("segueToMatchQueue", sender: self)
+        } else {
+            performSegueWithIdentifier("showMatchSummary", sender: self)
+        }
+    }
 }
 

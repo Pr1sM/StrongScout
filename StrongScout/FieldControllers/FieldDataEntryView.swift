@@ -223,6 +223,19 @@ class FieldDataEntryView: UIViewController {
         self.presentViewController(navControl, animated: true, completion: nil)
     }
     
+    @IBAction func cancelMatchEdit(sender:UIBarButtonItem) {
+        let ac = UIAlertController(title: "Cancel Match Edits", message: "Canceling match edits will discard all unsaved data.  Are you sure you want to continue?", preferredStyle: .Alert)
+        let discard = UIAlertAction(title: "Continue", style: .Destructive, handler: {(action) in
+            self.performSegueWithIdentifier("segueCancelMatch", sender: self)
+        })
+        let cancel = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+        
+        ac.addAction(discard)
+        ac.addAction(cancel)
+        
+        self.presentViewController(ac, animated: true, completion: nil)
+    }
+    
     @IBAction func unwindToFieldDataEntryView(sender:UIStoryboardSegue) {
         match = MatchStore.sharedStore.currentMatch!
         
@@ -230,6 +243,12 @@ class FieldDataEntryView: UIViewController {
                 (match.alliance == .red  && MatchStore.sharedStore.fieldLayout == .RedBlue)
         
         setupImageViews()
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "segueCancelMatch" {
+            MatchStore.sharedStore.cancelCurrentMatchEdit()
+        }
     }
 }
 

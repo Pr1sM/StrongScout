@@ -362,9 +362,9 @@
                         </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="Field" id="jCn-5C-XkM">
-                        <barButtonItem key="leftBarButtonItem" title="Test Form Sheet" id="Sd6-KA-hWk">
+                        <barButtonItem key="leftBarButtonItem" title="Cancel" id="zE8-tS-bQD">
                             <connections>
-                                <segue destination="C99-V1-bLI" kind="presentation" identifier="SegueToMatchSetup" modalPresentationStyle="formSheet" id="ej8-Pp-LRX"/>
+                                <action selector="cancelMatchEdit:" destination="unU-0A-cCl" id="bSA-Hy-jxS"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="done" id="PCy-K6-T3D">
@@ -376,9 +376,12 @@
                     <connections>
                         <outlet property="leftStack" destination="X7M-3v-8gO" id="SpI-zH-KpD"/>
                         <outlet property="rightStack" destination="GL0-i8-Dt4" id="Ydq-BH-nqU"/>
+                        <segue destination="C99-V1-bLI" kind="presentation" identifier="SegueToMatchSetup" modalPresentationStyle="formSheet" id="zp3-Kc-Kyl"/>
+                        <segue destination="Iy1-hE-FdP" kind="unwind" identifier="segueCancelMatch" unwindAction="unwindToMatchView:" id="cd0-gH-nJU"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IOe-MB-kTo" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="Iy1-hE-FdP" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2093" y="129"/>
         </scene>
@@ -779,7 +782,7 @@
                     <navigationItem key="navigationItem" title="Team Info" id="T0W-Et-Dmu">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="Ibf-gu-f8w">
                             <connections>
-                                <segue destination="yHP-1c-EiC" kind="unwind" unwindAction="unwindToFieldDataEntryView:" id="l7y-YR-coB"/>
+                                <segue destination="yHP-1c-EiC" kind="unwind" identifier="segueCancelStartMatch" unwindAction="unwindToMatchView:" id="l7y-YR-coB"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Next" id="x76-F7-Rn7">
@@ -952,9 +955,6 @@
                                     </subviews>
                                 </tableViewCellContentView>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <connections>
-                                    <segue destination="594-fK-etP" kind="showDetail" identifier="showMatchSummary" id="i3J-am-6T8"/>
-                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <sections/>
@@ -989,6 +989,10 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <segue destination="594-fK-etP" kind="showDetail" identifier="showMatchSummary" id="pYg-YU-95m"/>
+                        <segue destination="7sd-70-b6t" kind="presentation" identifier="segueToMatchQueue" modalPresentationStyle="fullScreen" id="9WA-Nh-55j"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>
@@ -1144,13 +1148,13 @@
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NCr-Sh-GRo">
                                                             <rect key="frame" x="0.0" y="0.0" width="286" height="23"/>
                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
-                                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="naZ-kN-7fQ">
                                                             <rect key="frame" x="294" y="5" width="290" height="17"/>
                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
-                                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                     </subviews>
@@ -1749,4 +1753,7 @@
     <resources>
         <image name="fieldLayoutBlueRed" width="1892" height="776"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="9WA-Nh-55j"/>
+    </inferredMetricsTieBreakers>
 </document>

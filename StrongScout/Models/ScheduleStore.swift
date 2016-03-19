@@ -74,6 +74,23 @@ class ScheduleStore: NSObject {
         print("Imported \(schedule.count) Schedule Items")
         self.saveSchedule()
     }
+    
+    func buildMatchListForGroup(group:Int) {
+        guard 1...7 ~= group && group != 4 else { return }
+        var stationCode = (group & 4) > 0 ? "Blue" : "Red"
+        stationCode += "\(group & 3)"
+        var teamList:[MatchQueueData] = [MatchQueueData]()
+        for item in schedule {
+            let m = item.matchNumber
+            for t in item.teams {
+                if t.station == stationCode {
+                    let data = MatchQueueData(match: m, team: t.teamNumber, alliance: (group & 4) > 0 ? .blue : .red)
+                    teamList.append(data)
+                }
+            }
+        }
+        MatchStore.sharedStore.createMatchQueueFromMatchData(teamList)
+    }
 }
 
 extension ScheduleStore: SessionStoreDelegate {

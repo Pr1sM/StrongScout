@@ -12,7 +12,8 @@ class MatchStore: NSObject {
     
     static let sharedStore:MatchStore = MatchStore()
     
-    var allMatches:[Match]? = []
+    var allMatches:[Match] = []
+    var matchesToScout:[MatchQueueData] = []
     var currentMatchIndex = -1
     var currentMatch:Match?
     var fieldLayout:FieldLayoutType = .BlueRed
@@ -25,29 +26,41 @@ class MatchStore: NSObject {
     override init() {
         super.init()
         
-        allMatches = NSKeyedUnarchiver.unarchiveObjectWithFile(self.matchArchivePath()) as? [Match]
+        allMatches = NSKeyedUnarchiver.unarchiveObjectWithFile(self.matchArchivePath()) as? [Match] ?? allMatches
+        let queueData = NSKeyedUnarchiver.unarchiveObjectWithFile(self.match2ScoutArchivePath()) as? [NSDictionary]
+        if let qD = queueData {
+            for d in qD {
+                let mqd = MatchQueueData(propertyListRepresentation: d)!
+                matchesToScout.append(mqd)
+            }
+        }
         
-        if allMatches == nil {
+        if allMatches.count == 0 {
             print("No Match data existed!")
             allMatches = []
         } else {
             print("Match Data successfully Loaded")
         }
         
-        let currentMatchData = NSUserDefaults.standardUserDefaults().objectForKey("StrongScout.currentMatch") as? NSData
+        //let currentMatchData = NSUserDefaults.standardUserDefaults().objectForKey("StrongScout.currentMatch") as? NSData
         let fieldLayout = NSUserDefaults.standardUserDefaults().integerForKey("StrongScout.fieldLayout")
         self.fieldLayout = FieldLayoutType(rawValue: fieldLayout)!
         
-        if currentMatchData == nil {
-            currentMatch = nil
-        } else {
-            currentMatch = NSKeyedUnarchiver.unarchiveObjectWithData(currentMatchData!) as? Match
-        }
+//        if currentMatchData == nil {
+//            currentMatch = nil
+//        } else {
+//            currentMatch = NSKeyedUnarchiver.unarchiveObjectWithData(currentMatchData!) as? Match
+//        }
     }
     
     func matchArchivePath() -> String {
         let documentFolder = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
         return (documentFolder as NSString).stringByAppendingPathComponent("Match.archive")
+    }
+    
+    func match2ScoutArchivePath() -> String {
+        let documentFolder = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
+        return (documentFolder as NSString).stringByAppendingPathComponent("MatchQueue.archive")
     }
     
     func csvFilePath() -> String {
@@ -60,28 +73,36 @@ class MatchStore: NSObject {
             return false
         }
         NSUserDefaults.standardUserDefaults().setInteger(fieldLayout.rawValue, forKey: "StrongScout.fieldLayout")
-        saveCurrentMatch()
+//        saveCurrentMatch()
         
         let path = self.matchArchivePath()
+        let path2 = self.match2ScoutArchivePath()
         
-        return NSKeyedArchiver.archiveRootObject(allMatches!, toFile: path)
+        var queueData = [NSDictionary]()
+        for mqd in matchesToScout {
+            let d = mqd.propertyListRepresentation()
+            queueData.append(d)
+        }
+        NSKeyedArchiver.archiveRootObject(queueData, toFile: path2)
+        
+        return NSKeyedArchiver.archiveRootObject(allMatches, toFile: path)
     }
     
-    func saveCurrentMatch() {
-        if currentMatch == nil {
-            NSUserDefaults.standardUserDefaults().setNilValueForKey("StrongScout.currentMatch")
-        } else {
-            let currentMatchData = NSKeyedArchiver.archivedDataWithRootObject(currentMatch!)
-            NSUserDefaults.standardUserDefaults().setValue(currentMatchData, forKey: "StrongScout.currentMatch")
-        }
-    }
+//    func saveCurrentMatch() {
+//        if currentMatch == nil {
+//            NSUserDefaults.standardUserDefaults().setNilValueForKey("StrongScout.currentMatch")
+//        } else {
+//            let currentMatchData = NSKeyedArchiver.archivedDataWithRootObject(currentMatch!)
+//            NSUserDefaults.standardUserDefaults().setValue(currentMatchData, forKey: "StrongScout.currentMatch")
+//        }
+//    }
     
     // MARK: TODO - FIX CSV FILE SAVING
     func writeCSVFile() -> Bool {
         let device = "\(UIDevice.currentDevice().name)    \r\n"
         var csvFileString = device
         
-        for m in allMatches! {
+        for m in allMatches {
             if let m:Match = m {
                 if m.isCompleted == 31 {
                     csvFileString += "WriteMatchGoesHere\r\n"
@@ -99,17 +120,34 @@ class MatchStore: NSObject {
     
     func createMatch() {
         currentMatch = Match()
+        currentMatchIndex = -1
+        actionsUndo.clearAll()
+        actionsRedo.clearAll()
+    }
+    
+    func createMatchFromQueueIndex(index:Int) {
+        guard 0..<matchesToScout.count ~= index else { return }
+        let data = matchesToScout[index]
+        currentMatch = Match(queueData: data)
+        currentMatchIndex = index
         actionsUndo.clearAll()
         actionsRedo.clearAll()
     }
     
     func addMatch(newMatch:Match) {
-        allMatches?.append(newMatch)
+        allMatches.append(newMatch)
+    }
+    
+    func cancelCurrentMatchEdit() {
+        currentMatch = nil
+        currentMatchIndex = -1
+        actionsUndo.clearAll()
+        actionsRedo.clearAll()
     }
     
     func containsMatch(match:Match?) -> Bool {
         if let search:Match = match {
-            for m in allMatches! {
+            for m in allMatches {
                 if m.teamNumber == search.teamNumber && m.matchNumber == search.matchNumber {
                     return true
                 }
@@ -118,18 +156,28 @@ class MatchStore: NSObject {
         return false
     }
     
+    func removeMatchQueueAtIndex(index:Int) {
+        guard 0..<matchesToScout.count ~= index else { return }
+        matchesToScout.removeAtIndex(index)
+    }
+    
+    func removeMatchAtIndex(index:Int) {
+        guard 0..<allMatches.count ~= index else { return }
+        allMatches.removeAtIndex(index)
+    }
+    
     func removeMatch(thisMatch:Match) {
-        for (index, value) in allMatches!.enumerate() {
+        for (index, value) in allMatches.enumerate() {
             if value.teamNumber == thisMatch.teamNumber && value.matchNumber == thisMatch.matchNumber {
-                allMatches?.removeAtIndex(index)
+                allMatches.removeAtIndex(index)
             }
         }
     }
     
     func replace(oldMatch:Match, withNewMatch newMatch:Match) {
-        for (index, value) in allMatches!.enumerate() {
+        for (index, value) in allMatches.enumerate() {
             if value.teamNumber == oldMatch.teamNumber && value.matchNumber == oldMatch.matchNumber {
-                allMatches![index] = newMatch
+                allMatches[index] = newMatch
             }
         }
     }
@@ -191,7 +239,11 @@ class MatchStore: NSObject {
     
     func finishCurrentMatch() {
         aggregateCurrentMatchData()
-        allMatches?.append(currentMatch!)
+        allMatches.append(currentMatch!)
+        if currentMatchIndex >= 0 {
+            matchesToScout.removeAtIndex(currentMatchIndex)
+        }
+        currentMatchIndex = -1
         let success = self.saveChanges()
         print("All Matches were \(success ? "" : "un")successfully saved")
         currentMatch = nil
@@ -200,7 +252,7 @@ class MatchStore: NSObject {
     func dataTransferMatchesAll(all:Bool) -> NSData? {
         var matchData = [NSDictionary]()
         
-        for match in allMatches! {
+        for match in allMatches {
             if(all || match.isCompleted & 32 == 32) {
                 if(match.isCompleted & 32 == 32) {
                     match.isCompleted ^= 32;
@@ -210,5 +262,13 @@ class MatchStore: NSObject {
         }
         
         return try? NSJSONSerialization.dataWithJSONObject(matchData, options: .PrettyPrinted)
+    }
+    
+    func createMatchQueueFromMatchData(data:[MatchQueueData]) {
+        guard data.count > 0 else { return }
+        
+        matchesToScout.removeAll()
+        matchesToScout = data
+        self.saveChanges()
     }
 }
