@@ -121,9 +121,7 @@ class MatchStore: NSObject {
         
         for m in allMatches {
             if let m:Match = m {
-                //if m.isCompleted == 31 {
                 csvFileString += m.writeMatchCSV() + " \r\n"
-                //}
             }
         }
         
@@ -133,6 +131,33 @@ class MatchStore: NSObject {
             return false
         }
         return true
+    }
+    
+    func exportNewMatchData() -> Bool {
+        
+        let device = "\(UIDevice.currentDevice().name)  \r\n"
+        var csvFileString = device
+        var matchJSONData = [NSDictionary]();
+        
+        csvFileString += Match.writeMatchCSVHeader()
+        
+        for m in allMatches {
+            if (m.isCompleted & 32) == 32 {
+                m.isCompleted ^= 32
+                csvFileString += m.writeMatchCSV() + " \r\n"
+                matchJSONData.append(m.messageDictionary())
+            }
+        }
+        
+        do {
+            try csvFileString.writeToFile(self.filePath("newMatchData.csv"), atomically: true, encoding: NSUTF8StringEncoding)
+            let jsonData = try NSJSONSerialization.dataWithJSONObject(matchJSONData, options: .PrettyPrinted)
+            jsonData.writeToFile(self.filePath("newMatchData.json"), atomically: true)
+        } catch {
+            return false
+        }
+        
+        return saveChanges()
     }
     
     func createMatch() {
@@ -271,12 +296,7 @@ class MatchStore: NSObject {
         var matchData = [NSDictionary]()
         
         for match in allMatches {
-            if(all || match.isCompleted & 32 == 32) {
-                if(match.isCompleted & 32 == 32) {
-                    match.isCompleted ^= 32;
-                }
-                matchData.append(match.messageDictionary())
-            }
+            matchData.append(match.messageDictionary())
         }
         
         return try? NSJSONSerialization.dataWithJSONObject(matchData, options: .PrettyPrinted)

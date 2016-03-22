@@ -448,7 +448,7 @@ class Match : NSObject, NSCoding {
         matchHeader += "D5 Auto Crossed, D5 Auto Attempted Cross, D5 Auto Crossed With Ball, D5 Auto Assisted Cross, "
         matchHeader += "D5 Tele Crossed, D5 Tele Attempted Cross, D5 Tele Crossed With Ball, D5 Tele Assisted Cross, "
         
-        matchHeader += "Final Score, Final Ranking Points, Final Penalty Score, Final Result, Fouls, Tech Fouls, Yellow Cards, Red Cards, Robot, Config, Comments \r\n"
+        matchHeader += "Final Score, Final Ranking Points, Penalty Points Received, Final Result, Fouls, Tech Fouls, Yellow Cards, Red Cards, Robot, Config, Comments \r\n"
         
         return matchHeader
     }
@@ -457,27 +457,17 @@ class Match : NSObject, NSCoding {
         var matchData = ""
         let match = JSON(messageDictionary())
         
-        // This will be done in a loop...eventually
-        
         matchData += "\(match["team", "matchNumber"].intValue),"
         matchData += "\(match["team", "teamNumber"].intValue),"
         matchData += "\(match["team", "alliance"].stringValue),"
         
-        matchData += "\(match["auto", "scoreHigh"].intValue),"
-        matchData += "\(match["auto", "scoreLow"].intValue),"
-        matchData += "\(match["auto", "missedHigh"].intValue),"
-        matchData += "\(match["auto", "missedLow"].intValue),"
-        matchData += "\(match["auto", "scoredBatters"].intValue),"
-        matchData += "\(match["auto", "scoredCourtyard"].intValue),"
-        matchData += "\(match["auto", "scoredDefenses"].intValue),"
-        
-        matchData += "\(match["score", "scoreHigh"].intValue),"
-        matchData += "\(match["score", "scoreLow"].intValue),"
-        matchData += "\(match["score", "missedHigh"].intValue),"
-        matchData += "\(match["score", "missedLow"].intValue),"
-        matchData += "\(match["score", "scoredBatters"].intValue),"
-        matchData += "\(match["score", "scoredCourtyard"].intValue),"
-        matchData += "\(match["score", "scoredDefenses"].intValue),"
+        let typeKeys = ["auto", "tele"]
+        let scoreKeys = ["scoreHigh", "missedHigh", "scoreLow", "missedLow", "scoreBatters", "missedBatters", "scoreCourtyard", "missedCourtyard", "scoreDefenses", "missedDefenses"]
+        for i in 0..<typeKeys.count {
+            for j in 0..<scoreKeys.count {
+                matchData += "\(match[typeKeys[i], scoreKeys[j]].intValue),"
+            }
+        }
         
         let defenseNames = ["defense1", "defense2", "defense3", "defense4", "defense5"]
         let defenseVals = ["type", "atcross", "afcross", "abcross", "aacross", "cross", "fcross", "bcross", "across"]
@@ -487,16 +477,10 @@ class Match : NSObject, NSCoding {
             }
         }
         
-        matchData += "\(match["final", "score"].intValue),"
-        matchData += "\(match["final", "rPoints"].intValue),"
-        matchData += "\(match["final", "pScore"].intValue),"
-        matchData += "\(match["final", "result"].intValue),"
-        matchData += "\(match["final", "fouls"].intValue),"
-        matchData += "\(match["final", "tFouls"].intValue),"
-        matchData += "\(match["final", "yCards"].intValue),"
-        matchData += "\(match["final", "rCards"].intValue),"
-        matchData += "\(match["final", "robot"].intValue),"
-        matchData += "\(match["final", "config"].intValue),"
+        let finalKeys = ["score", "rPoints", "pScore", "result", "fouls", "tFouls", "yCards", "rCards", "robot", "config"]
+        for i in 0..<finalKeys.count {
+            matchData += "\(match["final", finalKeys[i]].intValue),"
+        }
         matchData += "\(match["final", "comments"].stringValue)"
 
         return matchData

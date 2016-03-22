@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MBProgressHUD
 
 class MasterViewController: UITableViewController {
 
@@ -73,6 +74,34 @@ class MasterViewController: UITableViewController {
     
     @IBAction func unwindToMatchView(sender:UIStoryboardSegue) {
         self.tableView.reloadData()
+    }
+    
+    @IBAction func exportNewMatchData(sender:UIBarButtonItem) {
+        var temp = 0
+        for m in MatchStore.sharedStore.allMatches {
+            if (m.isCompleted & 32) == 32 { temp++ }
+        }
+        if temp <= 0 {
+            let ac = UIAlertController(title: "New Match Export Data", message: "There is no new match data, so no new data was written to the files", preferredStyle: .Alert)
+            let okAction = UIAlertAction(title: "Ok", style: .Cancel, handler: nil)
+            ac.addAction(okAction)
+            self.presentViewController(ac, animated: true, completion: nil)
+        } else {
+            let hud = MBProgressHUD.showHUDAddedTo(self.navigationController?.view, animated: true)
+            hud.mode = .Indeterminate
+            hud.labelText = "Exporting..."
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), {
+                MatchStore.sharedStore.exportNewMatchData()
+                dispatch_async(dispatch_get_main_queue(), {
+                    let hud = MBProgressHUD(forView: self.navigationController?.view)
+                    let imageView = UIImageView(image: UIImage(named: "check"))
+                    hud.customView = imageView
+                    hud.mode = .CustomView
+                    hud.labelText = "Completed"
+                    hud.hide(true, afterDelay: 1)
+                })
+            })
+        }
     }
 
     // MARK: - Table View
