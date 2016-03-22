@@ -28,9 +28,10 @@ class ResultsTeleopViewController: UIViewController {
         super.viewWillAppear(animated)
         
         self.navigationItem.title = "Defense Stats"
+        let defenseData = match.defenses
         let defenses = [defense1, defense2, defense3, defense4, defense5]
         for var i = 0; i < 5; i++ {
-            let data = match.defenses[i].toArray()
+            let data = defenseData[i].toArray(match.finalResult)
             for var j = 0; j < 5; j++ {
                 defenses[i][j].text = data[j]
             }

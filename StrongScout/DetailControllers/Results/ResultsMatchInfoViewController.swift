@@ -40,15 +40,27 @@ class ResultsMatchInfoViewController: UIViewController {
         matchNumber.text = "\(match.matchNumber)"
         alliance.text = "\(match.alliance.toString())"
         
-        finalResult.text = "\(match.finalResult.toString()) (\(match.finalRankingPoints))"
-        finalScore.text = "\(match.finalScore) (\(match.finalPenaltyScore))"
-        finalConfig.text = "\(match.finalConfiguration.toString())"
-        finalRobot.text = "\(match.finalRobot.toString())"
-        finalFouls.text = "\(match.finalFouls)"
-        finalTechFouls.text = "\(match.finalTechFouls)"
-        finalYellowCards.text = "\(match.finalYellowCards)"
-        finalRedCards.text = "\(match.finalRedCards)"
-        finalComments.text = match.finalComments
+        if match.finalResult == .noShow {
+            finalResult.text = "No Show"
+            finalScore.text = "---"
+            finalConfig.text = "---"
+            finalRobot.text = "---"
+            finalFouls.text = "---"
+            finalTechFouls.text = "---"
+            finalYellowCards.text = "---"
+            finalRedCards.text = "---"
+            finalComments.text = ""
+        } else {
+            finalResult.text = "\(match.finalResult.toString()) (\(match.finalRankingPoints))"
+            finalScore.text = "\(match.finalScore) (\(match.finalPenaltyScore))"
+            finalConfig.text = "\(match.finalConfiguration.toString())"
+            finalRobot.text = "\(match.finalRobot.toString())"
+            finalFouls.text = "\(match.finalFouls)"
+            finalTechFouls.text = "\(match.finalTechFouls)"
+            finalYellowCards.text = "\(match.finalYellowCards)"
+            finalRedCards.text = "\(match.finalRedCards)"
+            finalComments.text = match.finalComments
+        }
     }
 
     override func didReceiveMemoryWarning() {

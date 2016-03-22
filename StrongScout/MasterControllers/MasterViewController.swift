@@ -47,7 +47,7 @@ class MasterViewController: UITableViewController {
         if segue.identifier == "showMatchSummary" {
             if let indexPath = self.tableView.indexPathForSelectedRow {
                 let match = MatchStore.sharedStore.allMatches[indexPath.row]
-                match.aggregateActionsPerformed()
+                //match.aggregateActionsPerformed()
                 let storyboard = UIStoryboard(name: "Results", bundle: nil)
                 let sr = storyboard.instantiateViewControllerWithIdentifier("ResultsScoringViewController") as! ResultsScoringViewController
                 let tr = storyboard.instantiateViewControllerWithIdentifier("ResultsTeleopViewController") as! ResultsTeleopViewController

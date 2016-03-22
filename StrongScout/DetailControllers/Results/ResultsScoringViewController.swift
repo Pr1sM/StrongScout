@@ -35,17 +35,17 @@ class ResultsScoringViewController: UIViewController {
         
         self.navigationItem.title = "Score Results"
         
-        highGoalsLabel.text = "\(match.scoreHigh)/\(match.scoreHigh + match.scoreMissedHigh)"
-        lowGoalsLabel.text = "\(match.scoreLow)/\(match.scoreLow + match.scoreMissedLow)"
-        scoreBatters.text = "\(match.scoredBatters)"
-        scoreCourtyard.text = "\(match.scoredMiddle)"
-        scoreDefenses.text = "\(match.scoredDefenses)"
+        highGoalsLabel.text = "\(match.teleHigh.scored)/\(match.teleHigh.scored + match.teleHigh.missed)"
+        lowGoalsLabel.text = "\(match.teleLow.scored)/\(match.teleLow.scored + match.teleLow.missed)"
+        scoreBatters.text = "\(match.teleBatters.scored)/\(match.teleBatters.scored + match.teleBatters.missed)"
+        scoreCourtyard.text = "\(match.teleCourtyard.scored)/\(match.teleCourtyard.scored + match.teleCourtyard.missed)"
+        scoreDefenses.text = "\(match.teleDefenses.scored)/\(match.teleDefenses.scored + match.teleDefenses.missed)"
         
-        autoHighGoalsLabel.text = "\(match.autoScoreHigh)/\(match.autoScoreHigh + match.autoMissedHigh)"
-        autoLowGoalsLabel.text = "\(match.autoScoreLow)/\(match.autoScoreLow + match.autoMissedLow)"
-        autoScoreBatters.text = "\(match.autoScoredBatters)"
-        autoScoreCourtyard.text = "\(match.autoScoredMiddle)"
-        autoScoreDefenses.text = "\(match.autoScoredDefenses)"
+        autoHighGoalsLabel.text = "\(match.autoHigh.scored)/\(match.autoHigh.scored + match.autoHigh.missed)"
+        autoLowGoalsLabel.text = "\(match.autoLow.scored)/\(match.autoLow.scored + match.autoLow.missed)"
+        autoScoreBatters.text = "\(match.autoBatters.scored)/\(match.autoBatters.scored + match.autoBatters.missed)"
+        autoScoreCourtyard.text = "\(match.autoCourtyard.scored)/\(match.autoCourtyard.scored + match.autoCourtyard.missed)"
+        autoScoreDefenses.text = "\(match.autoDefenses.scored)/\(match.autoDefenses.scored + match.autoDefenses.missed)"
     }
 
     override func didReceiveMemoryWarning() {

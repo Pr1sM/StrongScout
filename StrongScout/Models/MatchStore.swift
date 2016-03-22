@@ -206,6 +206,7 @@ class MatchStore: NSObject {
             currentMatch?.matchNumber = match.matchNumber
             currentMatch?.alliance    = match.alliance
             currentMatch?.isCompleted = match.isCompleted
+            currentMatch?.finalResult = match.finalResult
             break;
         case .fieldSetup:
             currentMatch?.defense1.type = match.defense1.type

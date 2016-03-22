@@ -9,6 +9,8 @@
 import UIKit
 import SwiftyJSON
 
+typealias ScoreStat = (scored:Int, missed:Int)
+
 class Match : NSObject, NSCoding {
     
     // Team Info
@@ -20,23 +22,27 @@ class Match : NSObject, NSCoding {
     
     // Auto Scoring Info
     
-    var autoScoreHigh:Int = 0
-    var autoScoreLow:Int = 0
-    var autoMissedHigh:Int = 0
-    var autoMissedLow:Int = 0
-    var autoScoredBatters:Int = 0
-    var autoScoredMiddle:Int = 0
-    var autoScoredDefenses:Int = 0
+    var autoHigh:ScoreStat      = (0, 0)
+    var autoLow:ScoreStat       = (0, 0)
+    var autoBatters:ScoreStat   = (0, 0)
+    var autoCourtyard:ScoreStat = (0, 0)
+    var autoDefenses:ScoreStat  = (0, 0)
     
     // Scoring Info
     
-    var scoreHigh:Int = 0
-    var scoreLow:Int = 0
-    var scoreMissedHigh:Int = 0
-    var scoreMissedLow:Int = 0
-    var scoredBatters:Int = 0
-    var scoredMiddle:Int = 0
-    var scoredDefenses:Int = 0
+//    var scoreHigh:Int = 0
+//    var scoreLow:Int = 0
+//    var scoreMissedHigh:Int = 0
+//    var scoreMissedLow:Int = 0
+//    var scoredBatters:Int = 0
+//    var scoredMiddle:Int = 0
+//    var scoredDefenses:Int = 0
+    
+    var teleHigh:ScoreStat      = (0, 0)
+    var teleLow:ScoreStat       = (0, 0)
+    var teleBatters:ScoreStat   = (0, 0)
+    var teleCourtyard:ScoreStat = (0, 0)
+    var teleDefenses:ScoreStat  = (0, 0)
     
     // Defense Info
     
@@ -66,11 +72,17 @@ class Match : NSObject, NSCoding {
     var finalComments = ""
     
     func aggregateActionsPerformed() {
-        self.scoreHigh      = 0
-        self.scoreLow       = 0
-        self.scoredBatters  = 0
-        self.scoredDefenses = 0
-        self.scoredMiddle   = 0
+        self.teleHigh      = (0, 0)
+        self.teleLow       = (0, 0)
+        self.teleBatters   = (0, 0)
+        self.teleCourtyard = (0, 0)
+        self.teleDefenses  = (0, 0)
+        
+        self.autoHigh      = (0, 0)
+        self.autoLow       = (0, 0)
+        self.autoBatters   = (0, 0)
+        self.autoCourtyard = (0, 0)
+        self.autoDefenses  = (0, 0)
         
         self.defense1.clearStats()
         self.defense2.clearStats()
@@ -94,21 +106,27 @@ class Match : NSObject, NSCoding {
                 switch a.data {
                 case let .ScoreData(score):
                     if a.section == .tele {
-                        self.scoreHigh       += (score.type == .High)          ? 1 : 0
-                        self.scoreLow        += (score.type == .Low)           ? 1 : 0
-                        self.scoreMissedHigh += (score.type == .MissedHigh)    ? 1 : 0
-                        self.scoreMissedLow  += (score.type == .MissedLow)     ? 1 : 0
-                        self.scoredBatters   += (score.location == .Batter)    ? 1 : 0
-                        self.scoredMiddle    += (score.location == .Courtyard) ? 1 : 0
-                        self.scoredDefenses  += (score.location == .Defenses)  ? 1 : 0
+                        self.teleHigh.scored       += (score.type == .High)          ? 1 : 0
+                        self.teleHigh.missed       += (score.type == .MissedHigh)    ? 1 : 0
+                        self.teleLow.scored        += (score.type == .Low)           ? 1 : 0
+                        self.teleLow.missed        += (score.type == .MissedLow)     ? 1 : 0
+                        self.teleBatters.scored   += (score.location == .Batter && !score.type.missed)    ? 1 : 0
+                        self.teleBatters.missed   += (score.location == .Batter && score.type.missed)     ? 1 : 0
+                        self.teleCourtyard.scored += (score.location == .Courtyard && !score.type.missed) ? 1 : 0
+                        self.teleCourtyard.missed += (score.location == .Courtyard && score.type.missed)  ? 1 : 0
+                        self.teleDefenses.scored  += (score.location == .Defenses && !score.type.missed)  ? 1 : 0
+                        self.teleDefenses.missed  += (score.location == .Defenses && score.type.missed)   ? 1 : 0
                     } else {
-                        self.autoScoreHigh      += (score.type == .High)          ? 1 : 0
-                        self.autoScoreLow       += (score.type == .Low)           ? 1 : 0
-                        self.autoMissedHigh     += (score.type == .MissedHigh)    ? 1 : 0
-                        self.autoMissedLow      += (score.type == .MissedLow)     ? 1 : 0
-                        self.autoScoredBatters  += (score.location == .Batter)    ? 1 : 0
-                        self.autoScoredMiddle   += (score.location == .Courtyard) ? 1 : 0
-                        self.autoScoredDefenses += (score.location == .Defenses)  ? 1 : 0
+                        self.autoHigh.scored      += (score.type == .High)          ? 1 : 0
+                        self.autoHigh.missed      += (score.type == .MissedHigh)    ? 1 : 0
+                        self.autoLow.scored       += (score.type == .Low)           ? 1 : 0
+                        self.autoLow.missed       += (score.type == .MissedLow)     ? 1 : 0
+                        self.autoBatters.scored   += (score.location == .Batter && !score.type.missed)    ? 1 : 0
+                        self.autoBatters.missed   += (score.location == .Batter && score.type.missed)     ? 1 : 0
+                        self.autoCourtyard.scored += (score.location == .Courtyard && !score.type.missed) ? 1 : 0
+                        self.autoCourtyard.missed += (score.location == .Courtyard && score.type.missed)  ? 1 : 0
+                        self.autoDefenses.scored  += (score.location == .Defenses && !score.type.missed)  ? 1 : 0
+                        self.autoDefenses.missed  += (score.location == .Defenses && score.type.missed)   ? 1 : 0
                     }
                     continue
                 case let .DefenseData(defense):
@@ -197,22 +215,28 @@ class Match : NSObject, NSCoding {
         aCoder.encodeInteger(isCompleted,       forKey: "isCompleted")
         
         // Auto Score Information
-        aCoder.encodeInteger(autoScoreHigh,      forKey: "autoScoreHigh")
-        aCoder.encodeInteger(autoScoreLow,       forKey: "autoScoreLow")
-        aCoder.encodeInteger(autoMissedHigh,     forKey: "autoMissedHigh")
-        aCoder.encodeInteger(autoMissedLow,      forKey: "autoMissedLow")
-        aCoder.encodeInteger(autoScoredBatters,  forKey: "autoScoredBatters")
-        aCoder.encodeInteger(autoScoredMiddle,   forKey: "autoScoredCourtyard")
-        aCoder.encodeInteger(autoScoredDefenses, forKey: "autoScoredDefenses")
+        aCoder.encodeInteger(autoHigh.scored,      forKey: "autoScoreHigh")
+        aCoder.encodeInteger(autoHigh.missed,      forKey: "autoMissedHigh")
+        aCoder.encodeInteger(autoLow.scored,       forKey: "autoScoreLow")
+        aCoder.encodeInteger(autoLow.missed,       forKey: "autoMissedLow")
+        aCoder.encodeInteger(autoBatters.scored,   forKey: "autoScoredBatters")
+        aCoder.encodeInteger(autoBatters.missed,   forKey: "autoMissedBatters")
+        aCoder.encodeInteger(autoCourtyard.scored, forKey: "autoScoredCourtyard")
+        aCoder.encodeInteger(autoCourtyard.missed, forKey: "autoMissedCourtyard")
+        aCoder.encodeInteger(autoDefenses.scored,  forKey: "autoScoredDefenses")
+        aCoder.encodeInteger(autoDefenses.missed,  forKey: "autoMissedDefenses")
         
         // Score Information
-        aCoder.encodeInteger(scoreHigh,       forKey: "scoreHigh")
-        aCoder.encodeInteger(scoreLow,        forKey: "scoreLow")
-        aCoder.encodeInteger(scoreMissedHigh, forKey: "scoreMissedHigh")
-        aCoder.encodeInteger(scoreMissedLow,  forKey: "scoreMissedLow")
-        aCoder.encodeInteger(scoredBatters,   forKey: "scoredBatters")
-        aCoder.encodeInteger(scoredMiddle,    forKey: "scoredCourtyard")
-        aCoder.encodeInteger(scoredDefenses,  forKey: "scoredDefenses")
+        aCoder.encodeInteger(teleHigh.scored,      forKey: "teleScoreHigh")
+        aCoder.encodeInteger(teleHigh.missed,      forKey: "teleMissedHigh")
+        aCoder.encodeInteger(teleLow.scored,       forKey: "teleScoreLow")
+        aCoder.encodeInteger(teleLow.missed,       forKey: "teleMissedLow")
+        aCoder.encodeInteger(teleBatters.scored,   forKey: "teleScoredBatters")
+        aCoder.encodeInteger(teleBatters.missed,   forKey: "teleMissedBatters")
+        aCoder.encodeInteger(teleCourtyard.scored, forKey: "teleScoredCourtyard")
+        aCoder.encodeInteger(teleCourtyard.missed, forKey: "teleMissedCourtyard")
+        aCoder.encodeInteger(teleDefenses.scored,  forKey: "teleScoredDefenses")
+        aCoder.encodeInteger(teleDefenses.missed,  forKey: "teleMissedDefenses")
         
         // Defense Information
         aCoder.encodeObject(defense1.propertyListRepresentation(), forKey: "defense1")
@@ -251,22 +275,40 @@ class Match : NSObject, NSCoding {
         self.isCompleted = aDecoder.decodeIntegerForKey("isCompleted")
         
         // Auto Score Information
-        self.autoScoreHigh       = aDecoder.decodeIntegerForKey("autoScoreHigh")
-        self.autoScoreLow        = aDecoder.decodeIntegerForKey("autoScoreLow")
-        self.autoMissedHigh      = aDecoder.decodeIntegerForKey("autoMissedHigh")
-        self.autoMissedLow       = aDecoder.decodeIntegerForKey("autoMissedLow")
-        self.autoScoredBatters   = aDecoder.decodeIntegerForKey("autoScoredBatters")
-        self.autoScoredMiddle    = aDecoder.decodeIntegerForKey("autoScoredMiddle")
-        self.autoScoredDefenses  = aDecoder.decodeIntegerForKey("autoScoredDefenses")
+        var highScore       = aDecoder.decodeIntegerForKey("autoScoreHigh")
+        var highMiss        = aDecoder.decodeIntegerForKey("autoMissedHigh")
+        var lowScore        = aDecoder.decodeIntegerForKey("autoScoreLow")
+        var lowMiss         = aDecoder.decodeIntegerForKey("autoMissedLow")
+        var battersScore    = aDecoder.decodeIntegerForKey("autoScoredBatters")
+        var battersMissed   = aDecoder.decodeIntegerForKey("autoScoredBatters")
+        var courtyardScore  = aDecoder.decodeIntegerForKey("autoScoredCourtyard")
+        var courtyardMissed = aDecoder.decodeIntegerForKey("autoMissedCourtyard")
+        var defensesScore   = aDecoder.decodeIntegerForKey("autoScoredDefenses")
+        var defensesMissed  = aDecoder.decodeIntegerForKey("autoMissedDefenses")
+        
+        self.autoHigh       = (highScore, highMiss)
+        self.autoLow        = (lowScore, lowMiss)
+        self.autoBatters    = (battersScore, battersMissed)
+        self.autoCourtyard  = (courtyardScore, courtyardMissed)
+        self.autoDefenses   = (defensesScore, defensesMissed)
         
         // Score Information
-        self.scoreHigh       = aDecoder.decodeIntegerForKey("scoreHigh")
-        self.scoreLow        = aDecoder.decodeIntegerForKey("scoreLow")
-        self.scoreMissedHigh = aDecoder.decodeIntegerForKey("scoreMissedHigh")
-        self.scoreMissedLow  = aDecoder.decodeIntegerForKey("scoreMissedLow")
-        self.scoredBatters   = aDecoder.decodeIntegerForKey("scoredBatters")
-        self.scoredMiddle    = aDecoder.decodeIntegerForKey("scoredMiddle")
-        self.scoredDefenses  = aDecoder.decodeIntegerForKey("scoredDefenses")
+        highScore       = aDecoder.decodeIntegerForKey("teleScoreHigh")
+        highMiss        = aDecoder.decodeIntegerForKey("teleMissedHigh")
+        lowScore        = aDecoder.decodeIntegerForKey("teleScoreLow")
+        lowMiss         = aDecoder.decodeIntegerForKey("teleMissedLow")
+        battersScore    = aDecoder.decodeIntegerForKey("teleScoredBatters")
+        battersMissed   = aDecoder.decodeIntegerForKey("teleScoredBatters")
+        courtyardScore  = aDecoder.decodeIntegerForKey("teleScoredCourtyard")
+        courtyardMissed = aDecoder.decodeIntegerForKey("teleMissedCourtyard")
+        defensesScore   = aDecoder.decodeIntegerForKey("teleScoredDefenses")
+        defensesMissed  = aDecoder.decodeIntegerForKey("teleMissedDefenses")
+        
+        self.autoHigh       = (highScore, highMiss)
+        self.autoLow        = (lowScore, lowMiss)
+        self.autoBatters    = (battersScore, battersMissed)
+        self.autoCourtyard  = (courtyardScore, courtyardMissed)
+        self.autoDefenses   = (defensesScore, defensesMissed)
         
         // Defense Information
         self.defense1 = Defense(propertyListRepresentation: aDecoder.decodeObjectForKey("defense1") as? NSDictionary)!
@@ -311,7 +353,7 @@ class Match : NSObject, NSCoding {
         var data:[String:AnyObject]    = [String:AnyObject]()
         var team:[String:AnyObject]    = [String:AnyObject]()
         var auto:[String:AnyObject]    = [String:AnyObject]()
-        var score:[String:AnyObject]   = [String:AnyObject]()
+        var tele:[String:AnyObject]   = [String:AnyObject]()
         var defense:[String:AnyObject] = [String:AnyObject]()
         var final:[String:AnyObject]   = [String:AnyObject]()
         
@@ -321,22 +363,29 @@ class Match : NSObject, NSCoding {
         team["alliance"]    = alliance.toString()
         
         // Auto
-        auto["scoreHigh"]      = autoScoreHigh
-        auto["scoreLow"]       = autoScoreLow
-        auto["missedHigh"]     = autoMissedHigh
-        auto["missedLow"]      = autoMissedLow
-        auto["scoreBatters"]   = autoScoredBatters
-        auto["scoreCourtyard"] = autoScoredMiddle
-        auto["scoreDefenses"]  = autoScoredDefenses
+        auto["scoreHigh"]       = autoHigh.scored
+        auto["missedHigh"]      = autoHigh.missed
+        auto["scoreLow"]        = autoLow.scored
+        auto["missedLow"]       = autoLow.missed
+        auto["scoreBatters"]    = autoBatters.scored
+        auto["missedBatters"]   = autoBatters.missed
+        auto["scoreCourtyard"]  = autoCourtyard.scored
+        auto["missedCourtyard"] = autoCourtyard.missed
+        auto["scoreDefenses"]   = autoDefenses.scored
+        auto["missedDefenses"]  = autoDefenses.missed
         
         // Score
-        score["scoreHigh"]      = scoreHigh
-        score["scoreLow"]       = scoreLow
-        score["missedHigh"]     = scoreMissedHigh
-        score["missedLow"]      = scoreMissedLow
-        score["scoreBatters"]   = scoredBatters
-        score["scoreCourtyard"] = scoredMiddle
-        score["scoreDefenses"]  = scoredDefenses
+        tele["scoreHigh"]       = teleHigh.scored
+        tele["missedHigh"]      = teleHigh.missed
+        tele["scoreLow"]        = teleLow.scored
+        tele["missedLow"]       = teleLow.missed
+        tele["scoreBatters"]    = teleBatters.scored
+        tele["missedBatters"]   = teleBatters.missed
+        tele["scoreCourtyard"]  = teleCourtyard.scored
+        tele["missedCourtyard"] = teleCourtyard.missed
+        tele["scoreDefenses"]   = teleDefenses.scored
+        tele["missedDefenses"]  = teleDefenses.missed
+
         
         // Defenses
         defense["defense1"] = defense1.propertyListRepresentation()
@@ -361,7 +410,7 @@ class Match : NSObject, NSCoding {
         // All Data
         data["team"]    = team
         data["auto"]    = auto
-        data["score"]   = score
+        data["tele"]    = tele
         data["defense"] = defense
         data["final"]   = final
         
@@ -373,11 +422,11 @@ class Match : NSObject, NSCoding {
         
         matchHeader += "Match Number, Team Number, Alliance, "
         
-        matchHeader += "Auto Scored High, Auto Scored Low, Auto Missed High, Auto Missed Low, "
-        matchHeader += "Auto Scored Batters, Auto Scored Courtyard, Auto Scored Defenses, "
+        matchHeader += "Auto Scored High, Auto Missed High, Auto Scored Low, Auto Missed Low, "
+        matchHeader += "Auto Scored Batters, Auto Missed Batters, Auto Scored Courtyard, Auto Missed Courtyard, Auto Scored Defenses, Auto Missed Defenses, "
         
-        matchHeader += "Tele Scored High, Tele Scored Low, Tele Missed High, Tele Missed Low, "
-        matchHeader += "Tele Scored Batters, Tele Scored Courtyard, Tele Scored Defenses, "
+        matchHeader += "Tele Scored High, Tele Missed High, Tele Scored Low, Tele Missed Low, "
+        matchHeader += "Tele Scored Batters, Tele Missed Batters, Tele Scored Courtyard, Tele Missed Courtyard, Tele Scored Defenses, Tele Missed Defenses, "
         
         matchHeader += "Defense 1 Type, "
         matchHeader += "D1 Auto Crossed, D1 Auto Attempted Cross, D1 Auto Crossed With Ball, D1 Auto Assisted Cross, "
@@ -410,87 +459,45 @@ class Match : NSObject, NSCoding {
         
         // This will be done in a loop...eventually
         
-        matchData += "\(match["team", "matchNumber"].intValue), "
-        matchData += "\(match["team", "teamNumber"].intValue), "
-        matchData += "\(match["team", "alliance"].stringValue), "
+        matchData += "\(match["team", "matchNumber"].intValue),"
+        matchData += "\(match["team", "teamNumber"].intValue),"
+        matchData += "\(match["team", "alliance"].stringValue),"
         
-        matchData += "\(match["auto", "scoreHigh"].intValue), "
-        matchData += "\(match["auto", "scoreLow"].intValue), "
-        matchData += "\(match["auto", "missedHigh"].intValue), "
-        matchData += "\(match["auto", "missedLow"].intValue), "
-        matchData += "\(match["auto", "scoredBatters"].intValue), "
-        matchData += "\(match["auto", "scoredCourtyard"].intValue), "
-        matchData += "\(match["auto", "scoredDefenses"].intValue), "
+        matchData += "\(match["auto", "scoreHigh"].intValue),"
+        matchData += "\(match["auto", "scoreLow"].intValue),"
+        matchData += "\(match["auto", "missedHigh"].intValue),"
+        matchData += "\(match["auto", "missedLow"].intValue),"
+        matchData += "\(match["auto", "scoredBatters"].intValue),"
+        matchData += "\(match["auto", "scoredCourtyard"].intValue),"
+        matchData += "\(match["auto", "scoredDefenses"].intValue),"
         
-        matchData += "\(match["score", "scoreHigh"].intValue), "
-        matchData += "\(match["score", "scoreLow"].intValue), "
-        matchData += "\(match["score", "missedHigh"].intValue), "
-        matchData += "\(match["score", "missedLow"].intValue), "
-        matchData += "\(match["score", "scoredBatters"].intValue), "
-        matchData += "\(match["score", "scoredCourtyard"].intValue), "
-        matchData += "\(match["score", "scoredDefenses"].intValue), "
+        matchData += "\(match["score", "scoreHigh"].intValue),"
+        matchData += "\(match["score", "scoreLow"].intValue),"
+        matchData += "\(match["score", "missedHigh"].intValue),"
+        matchData += "\(match["score", "missedLow"].intValue),"
+        matchData += "\(match["score", "scoredBatters"].intValue),"
+        matchData += "\(match["score", "scoredCourtyard"].intValue),"
+        matchData += "\(match["score", "scoredDefenses"].intValue),"
         
-        matchData += "\(match["defense", "defense1", "type"].intValue), "
-        matchData += "\(match["defense", "defense1", "atcross"].intValue), "
-        matchData += "\(match["defense", "defense1", "afcross"].intValue), "
-        matchData += "\(match["defense", "defense1", "abcross"].intValue), "
-        matchData += "\(match["defense", "defense1", "aacross"].intValue), "
-        matchData += "\(match["defense", "defense1", "cross"].intValue), "
-        matchData += "\(match["defense", "defense1", "fcross"].intValue), "
-        matchData += "\(match["defense", "defense1", "bcross"].intValue), "
-        matchData += "\(match["defense", "defense1", "across"].intValue), "
+        let defenseNames = ["defense1", "defense2", "defense3", "defense4", "defense5"]
+        let defenseVals = ["type", "atcross", "afcross", "abcross", "aacross", "cross", "fcross", "bcross", "across"]
+        for i in 0..<defenseNames.count {
+            for j in 0..<defenseVals.count {
+                matchData += "\(match["defense", defenseNames[i], defenseVals[j]].intValue),"
+            }
+        }
         
-        matchData += "\(match["defense", "defense2", "type"].intValue), "
-        matchData += "\(match["defense", "defense2", "atcross"].intValue), "
-        matchData += "\(match["defense", "defense2", "afcross"].intValue), "
-        matchData += "\(match["defense", "defense2", "abcross"].intValue), "
-        matchData += "\(match["defense", "defense2", "aacross"].intValue), "
-        matchData += "\(match["defense", "defense2", "cross"].intValue), "
-        matchData += "\(match["defense", "defense2", "fcross"].intValue), "
-        matchData += "\(match["defense", "defense2", "bcross"].intValue), "
-        matchData += "\(match["defense", "defense2", "across"].intValue), "
-        
-        matchData += "\(match["defense", "defense3", "type"].intValue), "
-        matchData += "\(match["defense", "defense3", "atcross"].intValue), "
-        matchData += "\(match["defense", "defense3", "afcross"].intValue), "
-        matchData += "\(match["defense", "defense3", "abcross"].intValue), "
-        matchData += "\(match["defense", "defense3", "aacross"].intValue), "
-        matchData += "\(match["defense", "defense3", "cross"].intValue), "
-        matchData += "\(match["defense", "defense3", "fcross"].intValue), "
-        matchData += "\(match["defense", "defense3", "bcross"].intValue), "
-        matchData += "\(match["defense", "defense3", "across"].intValue), "
-        
-        matchData += "\(match["defense", "defense4", "type"].intValue), "
-        matchData += "\(match["defense", "defense4", "atcross"].intValue), "
-        matchData += "\(match["defense", "defense4", "afcross"].intValue), "
-        matchData += "\(match["defense", "defense4", "abcross"].intValue), "
-        matchData += "\(match["defense", "defense4", "aacross"].intValue), "
-        matchData += "\(match["defense", "defense4", "cross"].intValue), "
-        matchData += "\(match["defense", "defense4", "fcross"].intValue), "
-        matchData += "\(match["defense", "defense4", "bcross"].intValue), "
-        matchData += "\(match["defense", "defense4", "across"].intValue), "
-        
-        matchData += "\(match["defense", "defense5", "type"].intValue), "
-        matchData += "\(match["defense", "defense5", "atcross"].intValue), "
-        matchData += "\(match["defense", "defense5", "afcross"].intValue), "
-        matchData += "\(match["defense", "defense5", "abcross"].intValue), "
-        matchData += "\(match["defense", "defense5", "aacross"].intValue), "
-        matchData += "\(match["defense", "defense5", "cross"].intValue), "
-        matchData += "\(match["defense", "defense5", "fcross"].intValue), "
-        matchData += "\(match["defense", "defense5", "bcross"].intValue), "
-        matchData += "\(match["defense", "defense5", "across"].intValue), "
-        
-        matchData += "\(match["final", "score"].intValue), "
-        matchData += "\(match["final", "rPoints"].intValue), "
-        matchData += "\(match["final", "pScore"].intValue), "
-        matchData += "\(match["final", "result"].intValue), "
-        matchData += "\(match["final", "fouls"].intValue), "
-        matchData += "\(match["final", "tFouls"].intValue), "
-        matchData += "\(match["final", "yCards"].intValue), "
-        matchData += "\(match["final", "rCards"].intValue), "
-        matchData += "\(match["final", "robot"].intValue), "
-        matchData += "\(match["final", "config"].intValue), "
-        matchData += "\(match["final", "comments"].stringValue) "
+        matchData += "\(match["final", "score"].intValue),"
+        matchData += "\(match["final", "rPoints"].intValue),"
+        matchData += "\(match["final", "pScore"].intValue),"
+        matchData += "\(match["final", "result"].intValue),"
+        matchData += "\(match["final", "fouls"].intValue),"
+        matchData += "\(match["final", "tFouls"].intValue),"
+        matchData += "\(match["final", "yCards"].intValue),"
+        matchData += "\(match["final", "rCards"].intValue),"
+        matchData += "\(match["final", "robot"].intValue),"
+        matchData += "\(match["final", "config"].intValue),"
+        matchData += "\(match["final", "comments"].stringValue)"
 
         return matchData
     }

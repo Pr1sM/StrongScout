@@ -59,6 +59,10 @@ enum DefenseType:Int {
 enum ScoreType: Int {
     case Unknown = 0, MissedHigh, High, MissedLow, Low
     
+    var missed:Bool {
+        return (self == .MissedHigh || self == .MissedLow)
+    }
+    
     func toString() -> String {
         return (self == .High)        ? "Scored High Goal" :
                (self == .Low)         ? "Scored Low Goal " :
@@ -289,12 +293,14 @@ struct Defense: PropertyListReadable {
         self.autoTimesAssistedCross = 0
     }
     
-    func toArray() -> [String] {
-        return ["Defense \(self.location): \(self.type.toStringResults())",
-            "\(self.autoTimesCrossed) | \(self.timesCrossed)",
-            "\(self.autoTimesCrossedWithBall) | \(self.timesCrossedWithBall)",
-            "\(self.autoFailedTimesCrossed) | \(self.failedTimesCrossed)",
-            "\(self.autoTimesAssistedCross) | \(self.timesAssistedCross)"]
+    func toArray(finalResult:ResultType) -> [String] {
+        return finalResult == .noShow ? ["Defense \(self.location): \(self.type.toStringResults())",
+                                         "---", "---", "---", "---"] :
+                                        ["Defense \(self.location): \(self.type.toStringResults())",
+                                         "\(self.autoTimesCrossed) | \(self.timesCrossed)",
+                                         "\(self.autoTimesCrossedWithBall) | \(self.timesCrossedWithBall)",
+                                         "\(self.autoFailedTimesCrossed) | \(self.failedTimesCrossed)",
+                                         "\(self.autoTimesAssistedCross) | \(self.timesAssistedCross)"]
     }
     
     func propertyListRepresentation() -> NSDictionary {

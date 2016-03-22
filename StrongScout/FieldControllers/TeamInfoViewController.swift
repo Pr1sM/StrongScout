@@ -51,12 +51,19 @@ class TeamInfoViewController: UIViewController {
         
         teamNumberTextField.resignFirstResponder()
         matchNumberTextField.resignFirstResponder()
-        MatchStore.sharedStore.updateCurrentMatchForType(.teamInfo, match: m)
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "segueToEndMatchNoShow" {
+            MatchStore.sharedStore.updateCurrentMatchForType(.teamInfo, match: m)
+            MatchStore.sharedStore.finishCurrentMatch()
+        } else if segue.identifier == "segueToFieldSetup" {
+            MatchStore.sharedStore.updateCurrentMatchForType(.teamInfo, match: m)
+        }
     }
     
     func readyToMoveOn() {
         let disable = m.teamNumber <= 0 || m.matchNumber <= 0 || m.alliance == .unknown
-        
         self.navigationItem.rightBarButtonItem?.enabled = !disable
     }
     
@@ -91,10 +98,29 @@ class TeamInfoViewController: UIViewController {
         sender.selected = !sender.selected
         if(sender.selected) {
             m.finalResult = .noShow
+            self.navigationItem.rightBarButtonItem?.title = "End Match"
         } else {
             m.finalResult = .none
+            self.navigationItem.rightBarButtonItem?.title = "Next"
         }
         self.view.endEditing(true)
+    }
+    
+    @IBAction func nextButtonTap(sender:UIBarButtonItem) {
+        if m.finalResult == .noShow {
+            let noShowAC = UIAlertController(title: "No Show Match", message: "You've indicated that this team is a no show.  The match will now end.  Are you sure you want to continue?", preferredStyle: .Alert)
+            let continueAction = UIAlertAction(title: "Continue", style: .Default, handler: { (action) in
+                self.performSegueWithIdentifier("segueToEndMatchNoShow", sender: nil)
+            })
+            noShowAC.addAction(continueAction)
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+            noShowAC.addAction(cancelAction)
+            
+            self.presentViewController(noShowAC, animated: true, completion: nil)
+        } else {
+            self.performSegueWithIdentifier("segueToFieldSetup", sender: nil)
+        }
     }
     
     func backgroundTap(sender:UITapGestureRecognizer) {
