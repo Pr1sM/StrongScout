@@ -74,10 +74,10 @@ class CustomContainerArrayView: UIViewController {
         for (index, value) in views.enumerate() {
             let nc = UINavigationController(rootViewController: value)
             nc.navigationBar.tag = index
-            let tapRecog = UITapGestureRecognizer(target: self, action: "handleTap:")
+            let tapRecog = UITapGestureRecognizer(target: self, action: #selector(CustomContainerArrayView.handleTap(_:)))
             nc.navigationBar.addGestureRecognizer(tapRecog)
             if index > 0 {
-                let panRecog = UIPanGestureRecognizer(target: self, action: "handlePan:")
+                let panRecog = UIPanGestureRecognizer(target: self, action: #selector(CustomContainerArrayView.handlePan(_:)))
                 nc.navigationBar.addGestureRecognizer(panRecog)
                 let borderRect = CGRectMake(0, 0, CGRectGetWidth(nc.navigationBar.frame), 1)
                 let border = UIView(frame: borderRect)
@@ -128,7 +128,7 @@ class CustomContainerArrayView: UIViewController {
                 }
             }
         })
-        for var i = 0; i < self.viewData.count; i++ {
+        for i in 0..<self.viewData.count {
             self.viewData[i].isShowing = (i == sender.view!.tag)
         }
     }
@@ -137,19 +137,19 @@ class CustomContainerArrayView: UIViewController {
         if sender.state == .Began {
             self.panViews.removeAll()
             let view = self.viewData[sender.view!.tag]
-            for var i = 0; i < self.viewData.count; i++ {
+            for i in 0..<self.viewData.count {
                 if(i <= sender.view!.tag && view.viewPos == .Low && self.viewData[i].viewPos == .Low) {
                     panViews.append(self.viewData[i])
                 } else if i >= sender.view!.tag && view.viewPos == .High && self.viewData[i].viewPos == .High {
                     panViews.append(self.viewData[i])
                 }
             }
-            for var i = 0; i < self.panViews.count; i++ {
+            for i in 0..<self.panViews.count {
                 self.panViews[i].panStartCenter = self.panViews[i].nc.view.center
             }
         } else if sender.state == .Changed {
             let translation = sender.translationInView(self.viewData[sender.view!.tag].nc.view)
-            for var i = 0; i < self.panViews.count; i++ {
+            for i in 0..<self.panViews.count {
                 let newCenter = CGPoint(x: self.panViews[i].panStartCenter.x, y: self.panViews[i].panStartCenter.y + translation.y)
                 self.panViews[i].viewPos = self.panViews[i].halfwayPoint.y > newCenter.y ? .High : .Low
                 self.panViews[i].nc.view.center = newCenter
@@ -158,7 +158,7 @@ class CustomContainerArrayView: UIViewController {
             UIView.animateWithDuration(0.2, animations: {
                 for view in self.panViews {
                     view.nc.view.center = view.centerForViewPos()
-                    for var i = 0; i < self.viewData.count; i++ {
+                    for i in 0..<self.viewData.count {
                         if self.viewData[i].id == view.id {
                             self.viewData[i].viewPos = view.viewPos
                         }
@@ -166,7 +166,7 @@ class CustomContainerArrayView: UIViewController {
                 }
             }, completion: {complete in
                 self.viewData[self.viewData.count - 1].isShowing = true
-                for var i = 0; i < self.viewData.count-1; i++ {
+                for i in 0..<self.viewData.count-1 {
                     if self.viewData[i].viewPos == .High && self.viewData[i+1].viewPos == .Low {
                         self.viewData[self.viewData.count - 1].isShowing = false
                         self.viewData[i].isShowing = true

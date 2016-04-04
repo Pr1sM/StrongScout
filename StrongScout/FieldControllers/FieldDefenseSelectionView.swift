@@ -44,19 +44,19 @@ class FieldDefenseSelectionView: UIViewController, UIPopoverPresentationControll
         
         defenseImageViews = type1 ? [fifthDefense, fourthDefense, thirdDefense, secondDefense, firstDefense] : [firstDefense, secondDefense, thirdDefense, fourthDefense, fifthDefense]
         
-        let secondDefenseTap = UITapGestureRecognizer(target: self, action: "secondDefenseTap:")
+        let secondDefenseTap = UITapGestureRecognizer(target: self, action: #selector(FieldDefenseSelectionView.secondDefenseTap(_:)))
         secondDefense.addGestureRecognizer(secondDefenseTap)
         secondDefense.userInteractionEnabled = true
         
-        let thirdDefenseTap = UITapGestureRecognizer(target: self, action: "thirdDefenseTap:")
+        let thirdDefenseTap = UITapGestureRecognizer(target: self, action: #selector(FieldDefenseSelectionView.thirdDefenseTap(_:)))
         thirdDefense.addGestureRecognizer(thirdDefenseTap)
         thirdDefense.userInteractionEnabled = true
         
-        let fourthDefenseTap = UITapGestureRecognizer(target: self, action: "fourthDefenseTap:")
+        let fourthDefenseTap = UITapGestureRecognizer(target: self, action: #selector(FieldDefenseSelectionView.fourthDefenseTap(_:)))
         fourthDefense.addGestureRecognizer(fourthDefenseTap)
         fourthDefense.userInteractionEnabled = true
         
-        let fifthDefenseTap = UITapGestureRecognizer(target: self, action: "fifthDefenseTap:")
+        let fifthDefenseTap = UITapGestureRecognizer(target: self, action: #selector(FieldDefenseSelectionView.fifthDefenseTap(_:)))
         fifthDefense.addGestureRecognizer(fifthDefenseTap)
         fifthDefense.userInteractionEnabled = true
         

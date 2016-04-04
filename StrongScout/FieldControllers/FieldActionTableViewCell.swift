@@ -27,7 +27,7 @@ class FieldActionTableViewCell: UITableViewCell {
         
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        let recognizer = UIPanGestureRecognizer(target: self, action: "handlePan:")
+        let recognizer = UIPanGestureRecognizer(target: self, action: #selector(FieldActionTableViewCell.handlePan(_:)))
         recognizer.delegate = self
         self.addGestureRecognizer(recognizer)
     }
@@ -43,7 +43,7 @@ class FieldActionTableViewCell: UITableViewCell {
         
         super.init(coder: aDecoder)
         
-        let recognizer = UIPanGestureRecognizer(target: self, action: "handlePan:")
+        let recognizer = UIPanGestureRecognizer(target: self, action: #selector(FieldActionTableViewCell.handlePan(_:)))
         recognizer.delegate = self
         self.addGestureRecognizer(recognizer)
     }

@@ -24,7 +24,7 @@ class TeamInfoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: "backgroundTap:")
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(TeamInfoViewController.backgroundTap(_:)))
         tapRecognizer.numberOfTapsRequired = 1
         self.view.addGestureRecognizer(tapRecognizer)
     }

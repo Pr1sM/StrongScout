@@ -23,7 +23,7 @@ class FinalViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let backgroundTap = UITapGestureRecognizer(target: self, action: "backgroundTap:")
+        let backgroundTap = UITapGestureRecognizer(target: self, action: #selector(FinalViewController.backgroundTap(_:)))
         backgroundTap.numberOfTapsRequired = 1
         self.view.addGestureRecognizer(backgroundTap)
         
@@ -53,8 +53,8 @@ class FinalViewController: UIViewController {
     }
     
     func registerForKeyboardNotifications() {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWasShown:", name: UIKeyboardDidShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillBeHidden:", name: UIKeyboardWillHideNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(FinalViewController.keyboardWasShown(_:)), name: UIKeyboardDidShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(FinalViewController.keyboardWillBeHidden(_:)), name: UIKeyboardWillHideNotification, object: nil)
     }
     
     func deregisterForKeyboardNotifications() {

@@ -79,7 +79,7 @@ class MasterViewController: UITableViewController {
     @IBAction func exportNewMatchData(sender:UIBarButtonItem) {
         var temp = 0
         for m in MatchStore.sharedStore.allMatches {
-            if (m.isCompleted & 32) == 32 { temp++ }
+            if (m.isCompleted & 32) == 32 { temp += 1 }
         }
         if temp <= 0 {
             let ac = UIAlertController(title: "New Match Export Data", message: "There is no new match data, so no new data was written to the files", preferredStyle: .Alert)

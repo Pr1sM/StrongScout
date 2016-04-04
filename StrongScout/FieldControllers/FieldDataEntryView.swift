@@ -43,27 +43,27 @@ class FieldDataEntryView: UIViewController {
         goal = UIImageView(image: goalImage)
         goal.contentMode = .ScaleAspectFit
 
-        let firstDefenseTap = UITapGestureRecognizer(target: self, action: "firstDefenseTap:")
+        let firstDefenseTap = UITapGestureRecognizer(target: self, action: #selector(FieldDataEntryView.firstDefenseTap(_:)))
         firstDefense.addGestureRecognizer(firstDefenseTap)
         firstDefense.userInteractionEnabled = true
         
-        let secondDefenseTap = UITapGestureRecognizer(target: self, action: "secondDefenseTap:")
+        let secondDefenseTap = UITapGestureRecognizer(target: self, action: #selector(FieldDataEntryView.secondDefenseTap(_:)))
         secondDefense.addGestureRecognizer(secondDefenseTap)
         secondDefense.userInteractionEnabled = true
         
-        let thirdDefenseTap = UITapGestureRecognizer(target: self, action: "thirdDefenseTap:")
+        let thirdDefenseTap = UITapGestureRecognizer(target: self, action: #selector(FieldDataEntryView.thirdDefenseTap(_:)))
         thirdDefense.addGestureRecognizer(thirdDefenseTap)
         thirdDefense.userInteractionEnabled = true
         
-        let fourthDefenseTap = UITapGestureRecognizer(target: self, action: "fourthDefenseTap:")
+        let fourthDefenseTap = UITapGestureRecognizer(target: self, action: #selector(FieldDataEntryView.fourthDefenseTap(_:)))
         fourthDefense.addGestureRecognizer(fourthDefenseTap)
         fourthDefense.userInteractionEnabled = true
         
-        let fifthDefenseTap = UITapGestureRecognizer(target: self, action: "fifthDefenseTap:")
+        let fifthDefenseTap = UITapGestureRecognizer(target: self, action: #selector(FieldDataEntryView.fifthDefenseTap(_:)))
         fifthDefense.addGestureRecognizer(fifthDefenseTap)
         fifthDefense.userInteractionEnabled = true
         
-        let goalTap = UITapGestureRecognizer(target: self, action: "goalTap:")
+        let goalTap = UITapGestureRecognizer(target: self, action: #selector(FieldDataEntryView.goalTap(_:)))
         goal.addGestureRecognizer(goalTap)
         goal.userInteractionEnabled = true
     
@@ -83,7 +83,7 @@ class FieldDataEntryView: UIViewController {
         sectionSelection.selectedSegmentIndex = 0
         sectionSelection.tintColor = UIColor(red: 1.0, green: 0.40, blue: 0, alpha: 1.0)
         sectionSelection.setContentHuggingPriority(750, forAxis: .Vertical)
-        sectionSelection.addTarget(self, action: "sectionChange:", forControlEvents: .ValueChanged)
+        sectionSelection.addTarget(self, action: #selector(FieldDataEntryView.sectionChange(_:)), forControlEvents: .ValueChanged)
     }
     
     override func viewWillAppear(animated: Bool) {

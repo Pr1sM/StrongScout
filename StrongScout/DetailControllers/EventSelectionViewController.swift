@@ -59,7 +59,7 @@ class EventSelectionViewController: UIViewController {
         let hud = MBProgressHUD.showHUDAddedTo(self.navigationController?.view, animated: true)
         hud.mode = .Indeterminate
         hud.labelText = "Loading..."
-        hud.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "cancelRequest:"))
+        hud.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(EventSelectionViewController.cancelRequest(_:))))
         self.navigationItem.leftBarButtonItem?.enabled = false
         self.getScheduleButton.enabled = false
         self.buildListButton.enabled = false

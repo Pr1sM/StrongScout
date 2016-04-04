@@ -33,7 +33,7 @@ class ToolsViewController: UIViewController {
         peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
         
         fieldLayout.userInteractionEnabled = true
-        let tap = UITapGestureRecognizer(target: self, action: "fieldLayoutTap:")
+        let tap = UITapGestureRecognizer(target: self, action: #selector(fieldLayoutTap(_:)))
         fieldLayout.addGestureRecognizer(tap)
     }
     
@@ -86,7 +86,7 @@ class ToolsViewController: UIViewController {
     @IBAction func getEventList(sender:UIButton) {
         let hud = MBProgressHUD.showHUDAddedTo(self.navigationController?.view, animated: true)
         hud.labelText = "Loading..."
-        hud.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "cancelRequest:"))
+        hud.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cancelRequest(_:))))
         self.navigationItem.leftBarButtonItem?.enabled = false
         EventStore.sharedStore.getEventsList({(progress) in
             dispatch_async(dispatch_get_main_queue(), {

@@ -1,3 +1,4 @@
+
 //
 //  ResultsTeleopViewController.swift
 //  StrongScout
@@ -30,9 +31,9 @@ class ResultsTeleopViewController: UIViewController {
         self.navigationItem.title = "Defense Stats"
         let defenseData = match.defenses
         let defenses = [defense1, defense2, defense3, defense4, defense5]
-        for var i = 0; i < 5; i++ {
+        for i in 0 ..< 5 {
             let data = defenseData[i].toArray(match.finalResult)
-            for var j = 0; j < 5; j++ {
+            for j in 0 ..< 5 {
                 defenses[i][j].text = data[j]
             }
         }
