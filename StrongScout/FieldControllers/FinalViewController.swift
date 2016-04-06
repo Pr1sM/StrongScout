@@ -34,6 +34,7 @@ class FinalViewController: UIViewController {
         match = MatchStore.sharedStore.currentMatch!
         registerForKeyboardNotifications()
         readyToMoveOn()
+        FinalPenaltyScoreTextField.text = "\(match.finalPenaltyScore)"
     }
     
     override func viewDidDisappear(animated: Bool) {
@@ -83,78 +84,34 @@ class FinalViewController: UIViewController {
     }
     
     @IBAction func RobotButtonTap(sender:UIButton) {
-        if sender.tag == 1 {
-            if match.finalRobot.contains(.Stalled) {
-                match.finalRobot.remove(.Stalled)
-                sender.selected = false
-            }
-            else {
-                match.finalRobot.unionInPlace(.Stalled)
-                sender.selected = true
-            }
+        let rState = RobotState(rawValue: sender.tag)
+        if sender.selected {
+            match.finalRobot.subtractInPlace(rState)
+        } else {
+            match.finalRobot.unionInPlace(rState)
         }
-        else if sender.tag == 2 {
-            if match.finalRobot.contains(.Tipped) {
-                match.finalRobot.remove(.Tipped)
-                sender.selected = false
-            }
-            else {
-                match.finalRobot.unionInPlace(.Tipped)
-                sender.selected = true
-            }
+        for b in EndingRobotButtons {
+            b.selected = (b.tag & match.finalRobot.rawValue) == b.tag
         }
         self.view.endEditing(true)
-        //print("Final Robot: \(match.finalRobot)")
+        print("Final Robot: \(match.finalRobot)")
     }
     
     @IBAction func ConfigTap(sender:UIButton) {
-        if sender.tag == 1 {
-            if match.finalConfiguration == .challenge {
-                match.finalConfiguration = .none
-            }
-            else {
-                match.finalConfiguration = .challenge
-            }
-        }
-        else if sender.tag == 2 {
-            if match.finalConfiguration == .hang {
-                match.finalConfiguration = .none
-            }
-            else {
-                match.finalConfiguration = .hang
-            }
-        }
-        for b in EndingButtons{
-            if b.tag == 1 {
-                b.selected = match.finalConfiguration == .challenge
-            }
-            else if b.tag == 2{
-                b.selected = match.finalConfiguration == .hang
-            }
+        match.finalConfiguration = FinalConfigType(rawValue: sender.selected ? 0 : sender.tag)!
+        for b in EndingButtons {
+            b.selected = (b.tag == match.finalConfiguration.rawValue)
         }
         self.view.endEditing(true)
     }
     
     @IBAction func ResultTap(sender:UIButton) {
-        if sender.tag == 1 && match.finalResult != .loss {
-            match.finalResult = .loss
-        }
-        else if sender.tag == 2 && match.finalResult != .win {
-            match.finalResult = .win
-        }
-        else if sender.tag == 3 && match.finalResult != .tie {
-            match.finalResult = .tie
-        }
-        for b in MatchOutcomeButtons{
-            if b.tag == 1 {
-                b.selected = match.finalResult == .loss
-            }
-            else if b.tag == 2{
-                b.selected = match.finalResult == .win
-            }
-            else if b.tag == 3{
-                b.selected = match.finalResult == .tie
-            }
+        let result = ResultType(rawValue: sender.tag)!
+        if match.finalResult == result { return }
+        
+        match.finalResult = result;
+        for b in MatchOutcomeButtons {
+            b.selected = b.tag == match.finalResult.rawValue
         }
         self.view.endEditing(true)
         readyToMoveOn()

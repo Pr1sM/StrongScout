@@ -62,7 +62,7 @@ class Match : NSObject, NSCoding {
     var finalScore:Int = -1
     var finalRankingPoints:Int = -1
     var finalResult:ResultType = .none
-    var finalPenaltyScore:Int = -1
+    var finalPenaltyScore:Int = 0
     var finalFouls = 0
     var finalTechFouls = 0
     var finalYellowCards = 0

@@ -242,6 +242,8 @@ class FieldDataEntryView: UIViewController {
         type1 = (match.alliance == .blue && MatchStore.sharedStore.fieldLayout == .BlueRed) ||
                 (match.alliance == .red  && MatchStore.sharedStore.fieldLayout == .RedBlue)
         
+        self.navigationItem.title = "Match: \(match.matchNumber) Team: \(match.teamNumber)"
+        
         setupImageViews()
     }
     

@@ -11,23 +11,15 @@ import MBProgressHUD
 
 class MasterViewController: UITableViewController {
 
-    var detailViewController: DetailViewController? = nil
-    var objects = [String]()
-
-
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         self.navigationItem.leftBarButtonItem = self.editButtonItem()
-        
-        objects = ["Match 1", "Match 2", "Match 3", "The Rest"]
 
-        // let addButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "insertNewObject:")
-        // self.navigationItem.rightBarButtonItem = addButton
-        if let split = self.splitViewController {
-            let controllers = split.viewControllers
-            self.detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
-        }
+//        if let split = self.splitViewController {
+//            let controllers = split.viewControllers
+//            self.detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
+//        }
         
     }
 
@@ -60,6 +52,7 @@ class MasterViewController: UITableViewController {
                 controller.views = [sr, tr, mr]
                 controller.navigationItem.leftBarButtonItem = self.splitViewController?.displayModeButtonItem()
                 controller.navigationItem.leftItemsSupplementBackButton = true
+                controller.navigationItem.title = "Match: \(match.matchNumber) Team: \(match.teamNumber)"
             }
         } else if segue.identifier == "SegueToNewMatch" {
             MatchStore.sharedStore.createMatch()
@@ -87,20 +80,29 @@ class MasterViewController: UITableViewController {
             ac.addAction(okAction)
             self.presentViewController(ac, animated: true, completion: nil)
         } else {
-            let hud = MBProgressHUD.showHUDAddedTo(self.navigationController?.view, animated: true)
-            hud.mode = .Indeterminate
-            hud.labelText = "Exporting..."
-            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), {
-                MatchStore.sharedStore.exportNewMatchData()
-                dispatch_async(dispatch_get_main_queue(), {
-                    let hud = MBProgressHUD(forView: self.navigationController?.view)
-                    let imageView = UIImageView(image: UIImage(named: "check"))
-                    hud.customView = imageView
-                    hud.mode = .CustomView
-                    hud.labelText = "Completed"
-                    hud.hide(true, afterDelay: 1)
+            let ac = UIAlertController(title: "Export Data", message: "Are you sure you want to export data?  Doing so will overwrite previous data", preferredStyle: .Alert)
+            let cancelAction = UIAlertAction(title: "No", style: .Cancel, handler: nil)
+            ac.addAction(cancelAction)
+            
+            let continueAction = UIAlertAction(title: "Yes", style: .Default, handler: {(action) in
+                let hud = MBProgressHUD.showHUDAddedTo(self.navigationController?.view, animated: true)
+                hud.mode = .Indeterminate
+                hud.labelText = "Exporting..."
+                dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), {
+                    MatchStore.sharedStore.exportNewMatchData()
+                    self.tableView.reloadData()
+                    dispatch_async(dispatch_get_main_queue(), {
+                        let hud = MBProgressHUD(forView: self.navigationController?.view)
+                        let imageView = UIImageView(image: UIImage(named: "check"))
+                        hud.customView = imageView
+                        hud.mode = .CustomView
+                        hud.labelText = "Completed"
+                        hud.hide(true, afterDelay: 1)
+                    })
                 })
             })
+            ac.addAction(continueAction)
+            self.presentViewController(ac, animated: true, completion: nil)
         }
     }
 
@@ -125,14 +127,18 @@ class MasterViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCellWithIdentifier("MatchCell", forIndexPath: indexPath) as! MatchCell
 
         if indexPath.section == 0 {
             let match = MatchStore.sharedStore.matchesToScout[indexPath.row]
-            cell.textLabel!.text = "\(match.matchNumber) - \(match.teamNumber)"
+            cell.matchNumber.text = "\(match.matchNumber)"
+            cell.teamNumber.text = "\(match.teamNumber)"
         } else {
             let match = MatchStore.sharedStore.allMatches[indexPath.row]
-            cell.textLabel!.text = "\(match.matchNumber) - \(match.teamNumber)"
+            cell.matchNumber.text = "\(match.matchNumber)"
+            cell.teamNumber.text = "\(match.teamNumber)"
+            
+            cell.accessoryType = ((match.isCompleted & 32) != 32) ? .Checkmark : .None
         }
 
         return cell
