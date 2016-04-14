@@ -82,7 +82,7 @@ class MatchStore: NSObject {
         
         let path = self.matchArchivePath()
         let path2 = self.match2ScoutArchivePath()
-        let jsonPath = self.filePath("Match.json")
+        // let jsonPath = self.filePath("Match.json")
         
         var queueData = [NSDictionary]()
         for mqd in matchesToScout {
@@ -90,14 +90,14 @@ class MatchStore: NSObject {
             queueData.append(d)
         }
         
-        let data = dataTransferMatchesAll(true)
-        let string = String(data: data!, encoding: NSUTF8StringEncoding)
+        // let data = dataTransferMatchesAll(true)
+        // let string = String(data: data!, encoding: NSUTF8StringEncoding)
         
-        do {
-            try string?.writeToFile(jsonPath, atomically: true, encoding: NSUTF8StringEncoding)
-        } catch  {
-            
-        }
+//        do {
+//            try string?.writeToFile(jsonPath, atomically: true, encoding: NSUTF8StringEncoding)
+//        } catch  {
+//            
+//        }
         
         NSKeyedArchiver.archiveRootObject(queueData, toFile: path2)
         
@@ -151,8 +151,8 @@ class MatchStore: NSObject {
         
         do {
             try csvFileString.writeToFile(self.filePath("newMatchData.csv"), atomically: true, encoding: NSUTF8StringEncoding)
-            let jsonData = try NSJSONSerialization.dataWithJSONObject(matchJSONData, options: .PrettyPrinted)
-            jsonData.writeToFile(self.filePath("newMatchData.json"), atomically: true)
+            // let jsonData = try NSJSONSerialization.dataWithJSONObject(matchJSONData, options: .PrettyPrinted)
+            // jsonData.writeToFile(self.filePath("newMatchData.json"), atomically: true)
         } catch {
             return false
         }

@@ -133,6 +133,8 @@ class MasterViewController: UITableViewController {
             let match = MatchStore.sharedStore.matchesToScout[indexPath.row]
             cell.matchNumber.text = "\(match.matchNumber)"
             cell.teamNumber.text = "\(match.teamNumber)"
+            
+            cell.accessoryType = .None;
         } else {
             let match = MatchStore.sharedStore.allMatches[indexPath.row]
             cell.matchNumber.text = "\(match.matchNumber)"
