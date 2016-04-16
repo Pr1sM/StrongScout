@@ -309,4 +309,14 @@ class MatchStore: NSObject {
         matchesToScout = data
         self.saveChanges()
     }
+    
+    func clearMatchData(type:Int) {
+        if type & 1 == 1 {
+            matchesToScout.removeAll()
+        }
+        
+        if type & 2 == 2 {
+            allMatches.removeAll()
+        }
+    }
 }

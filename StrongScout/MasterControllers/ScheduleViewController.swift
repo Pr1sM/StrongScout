@@ -42,7 +42,6 @@ class ScheduleViewController: UITableViewController {
     @IBAction func unwindToSchedule(sender:UIStoryboardSegue) {
         self.tableView.reloadData()
     }
-
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("ScheduleCell", forIndexPath: indexPath) as! ScheduleCell

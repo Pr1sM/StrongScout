@@ -868,7 +868,7 @@
                     <toolbarItems>
                         <barButtonItem title="Export" id="QeM-ll-aqY">
                             <connections>
-                                <action selector="exportNewMatchData:" destination="7bK-jq-Zjz" id="peE-yX-8RQ"/>
+                                <action selector="handleExportOrClear:" destination="7bK-jq-Zjz" id="GU9-C9-1PL"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="dht-8m-gKS"/>
@@ -892,6 +892,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="clearExportButton" destination="QeM-ll-aqY" id="LLC-Tb-nYl"/>
                         <segue destination="594-fK-etP" kind="showDetail" identifier="showMatchSummary" id="pYg-YU-95m"/>
                         <segue destination="7sd-70-b6t" kind="presentation" identifier="segueToMatchQueue" modalPresentationStyle="fullScreen" id="9WA-Nh-55j"/>
                     </connections>
